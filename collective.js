@@ -262,7 +262,7 @@ function renderPreview() {
         }));
     })),
     el("h3", { text: "3. Confirmer" }),
-    el("label", { class: "check" }, confirm, " Confirmation : ces réponses sont définitives. Après transmission, elles ne pourront plus être modifiées et seront visibles par l'ensemble des participants."),
+    el("label", { class: "check" }, confirm, " Confirmation : ces réponses sont définitives. Après transmission, elles ne pourront plus être modifiées et seront visibles, nominativement, par les participants et l'administrateur."),
     el("div", { class: "row" }, send, el("button", { type: "button", class: "btn", text: "Annuler", onclick: function () { preview = null; render(); } })),
     result);
 }
