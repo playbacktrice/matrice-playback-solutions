@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Matrice Playback Solutions</title>
+<script>
+  // Thème appliqué avant l'affichage pour éviter un flash
+  try { var t = localStorage.getItem("mps-theme"); if (t === "dark" || t === "light") document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap bar">
+    <a class="brand" href="#accueil" aria-label="Accueil">
+      <img src="assets/logo.svg" alt="Playback Solutions" class="logo" id="logo" onerror="this.hidden=true;document.getElementById('logo-txt').hidden=false">
+      <span class="logo-txt" id="logo-txt" hidden>Playback Solutions</span>
+    </a>
+    <nav class="tabs" aria-label="Sections">
+      <a href="#accueil" data-v="accueil">La démarche</a>
+      <a href="#trame" data-v="trame">Mes réponses <span class="count" id="progress-count">0/29</span></a>
+      <a href="#fichier" data-v="fichier">Sauvegarder / transmettre</a>
+    </nav>
+    <button type="button" class="theme" id="theme-btn" aria-label="Changer de thème"></button>
+  </div>
+</header>
+
+<main>
+  <!-- ACCUEIL -->
+  <section class="wrap view" id="v-accueil">
+    <div class="hero">
+      <div class="eyebrow">Démarche de rapprochement · Playback Solutions</div>
+      <h1>Matrice Playback Solutions</h1>
+      <p class="lead">Un cadre commun pour voir comment nous pourrions travailler ensemble. Chacun répond de son côté, sur la même trame, puis nous mettons nos réponses en commun le même jour, à la même heure.</p>
+      <div class="row">
+        <a class="btn primary" href="#trame">Commencer mes réponses</a>
+        <span class="date">Mise en commun : <b>lundi 16 novembre 2026 à 11 h</b></span>
+      </div>
+    </div>
+
+    <div class="grid3">
+      <div class="step"><span class="n">1</span><h3>Je réponds</h3><p>Une réponse libre par sous-catégorie. Pas besoin de tout remplir d'un coup, ni d'avoir une vision arrêtée.</p></div>
+      <div class="step"><span class="n">2</span><h3>Mes réponses restent chez moi</h3><p>Elles sont enregistrées automatiquement dans ce navigateur, sur mon ordinateur. Personne d'autre ne les voit, pas même l'organisateur.</p></div>
+      <div class="step"><span class="n">3</span><h3>Je transmets le 16 novembre</h3><p>J'exporte mon fichier de réponses et je l'envoie à l'heure prévue. Toutes les réponses sont publiées en même temps.</p></div>
+    </div>
+
+    <div class="prose">
+      <h2>Les 4 sujets</h2>
+      <ul class="cats" id="cat-list"></ul>
+      <p class="muted">Les aspects économiques (chiffres, volume d'activité, modèle économique) feront l'objet d'une étape ultérieure. Ils ne sont pas demandés ici.</p>
+    </div>
+
+    <div class="notes">
+      <div class="note">
+        <h3>Bon à savoir</h3>
+        <ul>
+          <li>Les réponses sont liées à <b>ce navigateur sur cet ordinateur</b>. Si tu changes d'ordinateur ou de navigateur, exporte ton fichier puis réimporte-le.</li>
+          <li>Exporte régulièrement ton fichier : vider l'historique ou les données du navigateur efface les réponses.</li>
+          <li>Le nom que tu saisis sert à identifier ton fichier. Ce n'est pas une connexion sécurisée : lors de la transmission définitive, ton fichier sera rattaché à ton compte vérifié.</li>
+        </ul>
+      </div>
+      <div class="note ai">
+        <h3><span class="ai-badge">IA</span> Utilisation de l'intelligence artificielle</h3>
+        <ul>
+          <li><b>Sur cette page, aucune fonctionnalité n'utilise l'IA.</b> Tes réponses ne sont envoyées nulle part tant que tu ne transmets pas ton fichier.</li>
+          <li>Après le 16 novembre, une <b>synthèse</b> des réponses pourra être mise en forme par une IA (Claude). Tout contenu produit par l'IA portera le badge <span class="ai-badge">IA</span> pour le distinguer des réponses écrites par les participants.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRAME -->
+  <section class="wrap view" id="v-trame" hidden>
+    <div class="namebox">
+      <label for="p-name">Ton nom et ta structure</label>
+      <input id="p-name" type="text" maxlength="120" autocomplete="name" placeholder="Ex. : Prénom Nom — Société">
+      <p class="muted small">Associé à tes réponses et à ton fichier d'export.</p>
+    </div>
+    <div class="savebar" id="savebar" role="status" aria-live="polite"></div>
+    <div class="layout">
+      <nav class="toc" id="toc" aria-label="Sommaire"></nav>
+      <div class="cats-body" id="trame-body"></div>
+    </div>
+  </section>
+
+  <!-- FICHIER -->
+  <section class="wrap view" id="v-fichier" hidden>
+    <div class="prose">
+      <h2>Sauvegarder et transmettre</h2>
+      <p>Ton fichier contient ton nom et toutes tes réponses. Garde-le en lieu sûr : c'est aussi ta sauvegarde.</p>
+    </div>
+    <div class="cards2">
+      <div class="card">
+        <h3>Exporter mes réponses</h3>
+        <p class="muted" id="export-summary"></p>
+        <button type="button" class="btn primary" id="export-btn">Télécharger mon fichier (.json)</button>
+        <p class="msg" id="export-msg" role="status"></p>
+      </div>
+      <div class="card">
+        <h3>Réimporter un fichier</h3>
+        <p class="muted">Pour reprendre tes réponses sur un autre ordinateur ou navigateur, ou après avoir effacé les données.</p>
+        <input type="file" id="import-file" accept=".json,application/json" hidden>
+        <button type="button" class="btn" id="import-btn">Choisir un fichier…</button>
+        <div id="import-confirm" class="confirm" hidden></div>
+        <p class="msg" id="import-msg" role="status"></p>
+      </div>
+    </div>
+    <div class="card danger-zone">
+      <h3>Effacer mes réponses de ce navigateur</h3>
+      <p class="muted">Exporte d'abord ton fichier si tu veux les garder.</p>
+      <div class="row" id="clear-row"><button type="button" class="btn danger" id="clear-btn">Effacer</button></div>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap foot">Matrice Playback Solutions · réponses enregistrées uniquement dans ce navigateur · aucune fonctionnalité IA sur cette page</footer>
+
+<script src="trame.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
