@@ -34,7 +34,7 @@ window.TRAME = [
       { id: "c3-autonomie",   title: "Autonomie", hint: "Marge de manœuvre de chacun, ce qui doit être validé" },
       { id: "c3-imprevus",    title: "Gestion des imprévus", hint: "Réaction face à un problème, à une urgence, à un retard" },
       { id: "c3-outils",      title: "Outils et logiciels", hint: "Outils de gestion, devis, facturation, communication" },
-      { id: "c3-decision",    title: "Prise de décision", hint: "Qui décide quoi, et comment" }
+      { id: "c3-decision",    title: "Prise de décision", hint: "Qui décide quoi, et comment ?" }
     ]
   },
   {

@@ -77,10 +77,7 @@ function viewLogin(errText) {
       if (r.error) viewLogin(errMsg(r.error));
     }, function (err) { btn.disabled = false; viewLogin(errMsg(err)); });
   });
-  show(el("div", { class: "cards2" }, form,
-    el("div", { class: "card" },
-      el("h3", { text: "Avant le 16 novembre" }),
-      el("p", { class: "muted", text: "La saisie se poursuit dans l'onglet « Réponses ». Les réponses restent dans ce navigateur et ne sont visibles que de leur auteur. Aucune donnée n'est transmise avant confirmation, à partir de l'ouverture." }))));
+  show(form);
 }
 
 function viewSetPassword(errText) {
