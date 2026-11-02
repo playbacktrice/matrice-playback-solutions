@@ -310,6 +310,7 @@ function renderConsult() {
       .map(function (x) { return el("option", { value: x.item.id, text: x.item.title, selected: filters.item === x.item.id }); }));
   itemSel.addEventListener("change", function () { filters.item = itemSel.value; render(); });
 
+  var synItems = latestItems();
   var shown = ITEMS.filter(function (x) { return (!filters.cat || x.cat.id === filters.cat) && (!filters.item || x.item.id === filters.item); });
   var subs = submissions.filter(function (s) { return selected.indexOf(s.user_id) >= 0; });
   var groups = [], lastCat = null;
@@ -321,7 +322,8 @@ function renderConsult() {
         var a = (s.answers && s.answers[x.item.id]) || "";
         return el("div", { class: "cmp-cell" }, el("div", { class: "who", text: nameOf(s.user_id) }),
           a.trim() ? el("div", { class: "pre", text: a }) : el("div", { class: "muted small", text: "Pas de réponse" }));
-      }))));
+      })),
+      (synItems && synItems.items[x.item.id] && synItems.items[x.item.id].trim()) ? synBox(synItems, synItems.items[x.item.id]) : null));
   });
   return el("div", { class: "stack" }, statusList,
     el("div", { class: "card filters-card" },
@@ -332,25 +334,55 @@ function renderConsult() {
 }
 
 /* ------------------------------------------------------------ Synthèse */
+function synAuthor(s) {
+  if (!s.published_by) return "Générée et mise en ligne par une IA (Claude) le " + fmt(s.published_at);
+  return "Mise en ligne le " + fmt(s.published_at) + " par " + nameOf(s.published_by);
+}
+function synLabel(s) {
+  return s.ai_assisted ? el("span", {}, el("span", { class: "ai-badge", text: "IA" }), " Synthèse générée par une IA (Claude) à partir des réponses transmises")
+                       : el("span", { class: "muted", text: "Note rédigée sans IA" });
+}
+// Synthèse IA la plus récente qui contient des synthèses par question
+function latestItems() {
+  for (var i = 0; i < syntheses.length; i++) if (syntheses[i].items && Object.keys(syntheses[i].items).length) return syntheses[i];
+  return null;
+}
+function synBox(s, text) {
+  return el("div", { class: "syn-q" },
+    el("div", { class: "syn-q-head" }, el("span", { class: "ai-badge", text: "IA" }), " Synthèse de la question",
+      el("span", { class: "muted small", text: " · générée par une IA (Claude) le " + fmt(s.published_at) })),
+    el("div", { class: "pre", text: text }));
+}
+function renderSynVersion(s) {
+  var items = s.items || {};
+  var hasItems = Object.keys(items).length > 0;
+  var body = [];
+  if (s.content && s.content.trim()) body.push(el("div", { class: "stack" }, hasItems ? el("h4", { text: "Synthèse générale" }) : null, el("div", { class: "pre", text: s.content })));
+  if (hasItems) {
+    TRAME.forEach(function (c) {
+      var its = c.items.filter(function (i) { return items[i.id] && items[i.id].trim(); });
+      if (!its.length) return;
+      body.push(el("div", { class: "pv-cat", style: "--cc:var(--" + c.id + ")" }, el("h4", { text: c.num + ". " + c.title }),
+        its.map(function (i) { return el("div", { class: "pv-item" }, el("b", { text: i.title }), el("div", { class: "pre", text: items[i.id] })); })));
+    });
+  }
+  return el("article", { class: "card syn" },
+    el("div", { class: "row between" }, synLabel(s), el("span", { class: "muted small", text: synAuthor(s) })), body);
+}
 function renderSynthese() {
-  var list = syntheses.length ? syntheses.map(function (s) {
-    return el("article", { class: "card syn" },
-      el("div", { class: "row between" },
-        s.ai_assisted ? el("span", {}, el("span", { class: "ai-badge", text: "IA" }), " Synthèse générée par une IA (Claude) à partir des réponses transmises")
-                      : el("span", { class: "muted", text: "Synthèse rédigée sans IA" }),
-        el("span", { class: "muted small", text: "Mise en ligne le " + fmt(s.published_at) + " par " + nameOf(s.published_by) })),
-      el("div", { class: "pre", text: s.content }));
-  }) : [el("p", { class: "banner", text: "Aucune synthèse publiée pour l'instant." })];
+  var list = syntheses.length ? [renderSynVersion(syntheses[0])] : [el("p", { class: "banner", text: "Aucune synthèse mise en ligne pour l'instant." })];
+  if (syntheses.length > 1) list.push(el("details", { class: "older" }, el("summary", { text: "Versions précédentes (" + (syntheses.length - 1) + ")" }),
+    syntheses.slice(1).map(renderSynVersion)));
   var admin = null;
   if (status.is_admin) {
-    var ta = el("textarea", { id: "syn-content", maxlength: "100000", placeholder: "Texte de la synthèse" });
+    var ta = el("textarea", { id: "syn-content", maxlength: "100000", placeholder: "Texte de la note" });
     var yes = el("input", { type: "radio", name: "syn-ai", value: "1", id: "syn-ai-1" });
     var no = el("input", { type: "radio", name: "syn-ai", value: "0", id: "syn-ai-0" });
     var res = el("div");
-    var btn = el("button", { type: "button", class: "btn primary", text: "Mettre en ligne la synthèse" });
+    var btn = el("button", { type: "button", class: "btn", text: "Mettre en ligne la note" });
     btn.addEventListener("click", function () {
-      if (!ta.value.trim()) return res.replaceChildren(msg("La synthèse est vide.", "err"));
-      if (!yes.checked && !no.checked) return res.replaceChildren(msg("Indiquer si la synthèse a été générée par une IA.", "err"));
+      if (!ta.value.trim()) return res.replaceChildren(msg("La note est vide.", "err"));
+      if (!yes.checked && !no.checked) return res.replaceChildren(msg("Indiquer si le texte a été généré par une IA.", "err"));
       btn.disabled = true;
       sb.rpc("publish_synthesis", { p_content: ta.value, p_ai_assisted: yes.checked }).then(function (r) {
         btn.disabled = false;
@@ -358,14 +390,14 @@ function renderSynthese() {
         refresh();
       });
     });
-    admin = el("div", { class: "card" }, el("h3", { text: "Mettre en ligne une synthèse (administrateur)" }),
-      el("p", { class: "muted small", text: "Chaque mise en ligne s'ajoute aux précédentes, qui restent consultables. Les réponses originales ne sont jamais modifiées." }),
+    admin = el("details", { class: "card admin-note" }, el("summary", { text: "Ajouter une note manuelle (administrateur)" }),
+      el("p", { class: "muted small", text: "Les synthèses par question sont générées et mises en ligne par l'IA (Claude). Ce formulaire permet d'ajouter une note complémentaire ; chaque mise en ligne s'ajoute aux précédentes. Les réponses originales ne sont jamais modifiées." }),
       ta,
       el("div", { class: "row" }, el("span", { class: "lab", text: "Générée par une IA ?" }),
         el("label", { class: "check" }, yes, " Oui"), el("label", { class: "check" }, no, " Non")),
       btn, res);
   }
-  return el("div", { class: "stack" }, admin, list);
+  return el("div", { class: "stack" }, list, admin);
 }
 
 /* ------------------------------------------------------------ Temps réel */
