@@ -32,7 +32,7 @@ function show() { root.replaceChildren.apply(root, Array.prototype.slice.call(ar
 
 var cfg = window.MPS_CONFIG || {};
 if (!window.supabase || !cfg.supabaseUrl) {
-  show(el("p", { class: "banner warn", text: "La mise en commun est momentanément indisponible (connexion au service impossible). Tes réponses locales ne sont pas concernées." }));
+  show(el("p", { class: "banner warn", text: "La mise en commun est momentanément indisponible (connexion au service impossible). Les réponses locales ne sont pas concernées." }));
   return;
 }
 var sb = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseKey, {
@@ -47,13 +47,13 @@ var channel = null, pollTimer = null, openTimer = null;
 
 function errMsg(e) {
   var m = (e && e.message) || String(e), code = e && e.code;
-  if (/Failed to fetch|NetworkError|Load failed/i.test(m)) return "Connexion au serveur impossible. Vérifie ta connexion internet.";
+  if (/Failed to fetch|NetworkError|Load failed/i.test(m)) return "Connexion au serveur impossible. Vérifier la connexion internet.";
   if (/Invalid login/i.test(m)) return "Email ou mot de passe incorrect.";
-  if (code === "PT401") return "Ton compte n'est pas autorisé pour cette consultation. Contacte Anthony.";
+  if (code === "PT401") return "Ce compte n'est pas autorisé pour cette consultation. Contacter l'administrateur.";
   if (code === "PT403") return "La mise en commun n'est pas encore ouverte.";
-  if (code === "PT409") return "Tes réponses ont déjà été transmises : une seule transmission par participant.";
+  if (code === "PT409") return "Les réponses de ce compte ont déjà été transmises : une seule transmission par participant.";
   if (code === "PT422") return "Fichier refusé : " + m;
-  if (/JWT|session/i.test(m)) return "Ta session a expiré. Reconnecte-toi.";
+  if (/JWT|session/i.test(m)) return "La session a expiré. Merci de se reconnecter.";
   return "Erreur : " + m;
 }
 function msg(text, kind) { return el("p", { class: "msg " + (kind || ""), role: kind === "err" ? "alert" : "status", text: text }); }
@@ -68,7 +68,7 @@ function viewLogin(errText) {
     el("label", {}, el("span", { class: "lab", text: "Email" }), email),
     el("label", {}, el("span", { class: "lab", text: "Mot de passe" }), pass),
     btn,
-    el("p", { class: "muted small", text: "Les comptes sont créés par Anthony (pas d'inscription en ligne). Mot de passe oublié : contacte-le." }),
+    el("p", { class: "muted small", text: "Les comptes sont créés par l'administrateur (pas d'inscription en ligne). En cas d'oubli du mot de passe, contacter l'administrateur." }),
     errText ? msg(errText, "err") : null);
   form.addEventListener("submit", function (e) {
     e.preventDefault(); btn.disabled = true;
@@ -80,14 +80,14 @@ function viewLogin(errText) {
   show(el("div", { class: "cards2" }, form,
     el("div", { class: "card" },
       el("h3", { text: "Avant le 16 novembre" }),
-      el("p", { class: "muted", text: "Continue à remplir tes réponses dans l'onglet « Mes réponses ». Elles restent dans ce navigateur, visibles de toi seul. Rien n'est transmis avant que tu le confirmes ici, à partir de l'ouverture." }))));
+      el("p", { class: "muted", text: "La saisie se poursuit dans l'onglet « Réponses ». Les réponses restent dans ce navigateur et ne sont visibles que de leur auteur. Aucune donnée n'est transmise avant confirmation, à partir de l'ouverture." }))));
 }
 
 function viewSetPassword(errText) {
   var p1 = el("input", { id: "c-new1", type: "password", autocomplete: "new-password", minlength: "10", required: true });
   var p2 = el("input", { id: "c-new2", type: "password", autocomplete: "new-password", minlength: "10", required: true });
   var btn = el("button", { type: "submit", class: "btn primary", text: "Enregistrer le mot de passe" });
-  var form = el("form", { class: "card auth" }, el("h3", { text: "Choisis ton mot de passe" }),
+  var form = el("form", { class: "card auth" }, el("h3", { text: "Définir le mot de passe" }),
     el("p", { class: "muted small", text: "10 caractères minimum." }),
     el("label", {}, el("span", { class: "lab", text: "Nouveau mot de passe" }), p1),
     el("label", {}, el("span", { class: "lab", text: "Confirmation" }), p2), btn,
@@ -147,12 +147,15 @@ function header() {
 
 function render() {
   if (!status.is_participant) {
-    return show(header(), el("p", { class: "banner warn", text: "Ce compte n'est pas (ou plus) autorisé pour cette consultation. Contacte Anthony." }));
+    return show(header(), el("p", { class: "banner warn", text: "Ce compte n'est pas (ou plus) autorisé pour cette consultation. Contacter l'administrateur." }));
   }
   if (!status.is_open) return renderClosed();
+  var canSubmit = status.can_submit !== undefined ? status.can_submit : !status.is_admin;
   var parts = [header()];
-  if (!status.has_submitted) parts.push(renderSubmit());
-  else parts.push(el("p", { class: "banner ok", text: "Tes réponses ont bien été transmises. Elles ne peuvent plus être modifiées. Tes réponses locales restent dans ce navigateur." }));
+  if (status.rehearsal) parts.push(el("p", { class: "banner warn", text: "MODE RÉPÉTITION — accès anticipé réservé aux comptes de test. Les autres participants voient toujours la mise en commun fermée. Les données de test seront supprimées avant l'ouverture." }));
+  if (!canSubmit) parts.push(el("p", { class: "banner", text: "Compte administrateur : consultation des réponses et publication de la synthèse. Ce compte ne transmet pas de réponses." }));
+  else if (!status.has_submitted) parts.push(renderSubmit());
+  else parts.push(el("p", { class: "banner ok", text: "Les réponses ont bien été transmises. Elles ne peuvent plus être modifiées. La copie locale reste disponible dans ce navigateur." }));
   parts.push(renderTabs());
   show.apply(null, parts);
 }
@@ -171,7 +174,7 @@ function renderClosed() {
   show(header(), el("div", { class: "card" },
     el("h3", { text: "La mise en commun n'est pas encore ouverte" }),
     el("p", {}, "Ouverture le ", el("b", { text: fmt(status.opens_at) }), " (heure du serveur). Temps restant : ", count),
-    el("p", { class: "muted", text: "Aucune réponse n'est accessible avant cette heure, pour personne. D'ici là, tes réponses restent dans ton navigateur : pense à télécharger une sauvegarde (onglet « Sauvegarder »)." })),
+    el("p", { class: "muted", text: "Aucune réponse n'est accessible avant cette heure. D'ici là, les réponses restent dans le navigateur de chaque participant ; une sauvegarde régulière est recommandée (onglet « Sauvegarder »)." })),
     diff > 0 ? null : msg("Ouverture imminente…"));
 }
 
@@ -201,11 +204,11 @@ function renderSubmit() {
   box.append(
     el("h3", { text: "1. Choisir les réponses à transmettre" }),
     el("div", { class: "row" },
-      el("button", { type: "button", class: "btn", text: "Importer mon fichier JSON…", onclick: function () { fileInput.click(); } }),
+      el("button", { type: "button", class: "btn", text: "Importer un fichier JSON…", onclick: function () { fileInput.click(); } }),
       localCount ? el("button", { type: "button", class: "btn", text: "Utiliser les réponses de ce navigateur (" + localCount + ")",
         onclick: function () { setPreview(window.MPS_LOCAL.buildExport(), "ce navigateur"); } }) : null),
     fileInput,
-    el("p", { class: "muted small", text: "Rien n'est envoyé à cette étape : tu verras tes réponses avant de confirmer." }),
+    el("p", { class: "muted small", text: "Aucune donnée n'est envoyée à cette étape : les réponses sont affichées pour vérification avant confirmation." }),
     out);
   if (preview) out.replaceChildren(renderPreview());
   return box;
@@ -248,7 +251,7 @@ function renderPreview() {
     el("h3", { text: "2. Vérifier avant de transmettre" }),
     el("p", {}, "Source : " + preview.source + " · Nom indiqué : ", el("b", { text: p.name || "(aucun)" }),
       " · " + p.count + " sous-catégorie" + (p.count > 1 ? "s" : "") + " renseignée" + (p.count > 1 ? "s" : "") + " sur " + ITEMS.length + "."),
-    nameWarn ? msg("Le nom indiqué dans le fichier diffère du nom de ton compte (" + status.display_name + "). Les réponses seront enregistrées au nom de ton compte.", "warn") : null,
+    nameWarn ? msg("Le nom indiqué dans le fichier diffère du nom du compte (" + status.display_name + "). Les réponses seront enregistrées au nom du compte.", "warn") : null,
     el("div", { class: "preview" }, TRAME.map(function (c) {
       return el("div", { class: "pv-cat", style: "--cc:var(--" + c.id + ")" },
         el("h4", { text: c.num + ". " + c.title }),
@@ -259,7 +262,7 @@ function renderPreview() {
         }));
     })),
     el("h3", { text: "3. Confirmer" }),
-    el("label", { class: "check" }, confirm, " Je confirme que ce sont mes réponses définitives. Après transmission, elles ne pourront plus être modifiées et seront visibles par tous les participants."),
+    el("label", { class: "check" }, confirm, " Confirmation : ces réponses sont définitives. Après transmission, elles ne pourront plus être modifiées et seront visibles par l'ensemble des participants."),
     el("div", { class: "row" }, send, el("button", { type: "button", class: "btn", text: "Annuler", onclick: function () { preview = null; render(); } })),
     result);
 }
@@ -281,7 +284,7 @@ function nameOf(uid) {
 }
 
 function renderConsult() {
-  var active = participants.filter(function (p) { return p.active; });
+  var active = participants.filter(function (p) { return p.active && p.role === "participant"; });
   var subIds = {}; submissions.forEach(function (s) { subIds[s.user_id] = s; });
   var statusList = el("p", { class: "muted small" }, "Transmissions : " + submissions.length + "/" + active.length + " — ",
     active.map(function (p, i) { return [i ? ", " : "", el("span", { class: subIds[p.user_id] ? "ok-txt" : "", text: p.display_name + (subIds[p.user_id] ? " ✓" : " (en attente)") })]; }));
@@ -324,7 +327,7 @@ function renderConsult() {
     el("div", { class: "card filters-card" },
       el("div", { class: "row" }, el("span", { class: "lab", text: "Participants" }), chips),
       el("div", { class: "row" }, catSel, itemSel)),
-    subs.length ? groups : el("p", { class: "banner", text: "Sélectionne au moins un participant." }),
+    subs.length ? groups : el("p", { class: "banner", text: "Sélectionner au moins un participant." }),
     el("p", { class: "muted small", text: "Réponses originales, telles que transmises, sans modification ni traitement par IA." }));
 }
 
@@ -333,9 +336,9 @@ function renderSynthese() {
   var list = syntheses.length ? syntheses.map(function (s) {
     return el("article", { class: "card syn" },
       el("div", { class: "row between" },
-        s.ai_assisted ? el("span", {}, el("span", { class: "ai-badge", text: "IA" }), " Synthèse mise en forme avec une IA (Claude), à partir des réponses transmises")
+        s.ai_assisted ? el("span", {}, el("span", { class: "ai-badge", text: "IA" }), " Synthèse générée par une IA (Claude) à partir des réponses transmises")
                       : el("span", { class: "muted", text: "Synthèse rédigée sans IA" }),
-        el("span", { class: "muted small", text: "Publiée le " + fmt(s.published_at) + " par " + nameOf(s.published_by) })),
+        el("span", { class: "muted small", text: "Mise en ligne le " + fmt(s.published_at) + " par " + nameOf(s.published_by) })),
       el("div", { class: "pre", text: s.content }));
   }) : [el("p", { class: "banner", text: "Aucune synthèse publiée pour l'instant." })];
   var admin = null;
@@ -344,10 +347,10 @@ function renderSynthese() {
     var yes = el("input", { type: "radio", name: "syn-ai", value: "1", id: "syn-ai-1" });
     var no = el("input", { type: "radio", name: "syn-ai", value: "0", id: "syn-ai-0" });
     var res = el("div");
-    var btn = el("button", { type: "button", class: "btn primary", text: "Publier la synthèse" });
+    var btn = el("button", { type: "button", class: "btn primary", text: "Mettre en ligne la synthèse" });
     btn.addEventListener("click", function () {
       if (!ta.value.trim()) return res.replaceChildren(msg("La synthèse est vide.", "err"));
-      if (!yes.checked && !no.checked) return res.replaceChildren(msg("Indique si la synthèse a été mise en forme avec une IA.", "err"));
+      if (!yes.checked && !no.checked) return res.replaceChildren(msg("Indiquer si la synthèse a été générée par une IA.", "err"));
       btn.disabled = true;
       sb.rpc("publish_synthesis", { p_content: ta.value, p_ai_assisted: yes.checked }).then(function (r) {
         btn.disabled = false;
@@ -355,10 +358,10 @@ function renderSynthese() {
         refresh();
       });
     });
-    admin = el("div", { class: "card" }, el("h3", { text: "Publier une synthèse (administrateur)" }),
-      el("p", { class: "muted small", text: "Chaque publication s'ajoute aux précédentes, qui restent consultables. Les réponses originales ne sont jamais modifiées." }),
+    admin = el("div", { class: "card" }, el("h3", { text: "Mettre en ligne une synthèse (administrateur)" }),
+      el("p", { class: "muted small", text: "Chaque mise en ligne s'ajoute aux précédentes, qui restent consultables. Les réponses originales ne sont jamais modifiées." }),
       ta,
-      el("div", { class: "row" }, el("span", { class: "lab", text: "Mise en forme par IA ?" }),
+      el("div", { class: "row" }, el("span", { class: "lab", text: "Générée par une IA ?" }),
         el("label", { class: "check" }, yes, " Oui"), el("label", { class: "check" }, no, " Non")),
       btn, res);
   }

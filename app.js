@@ -58,7 +58,7 @@ function saveNow() {
     setSaveBar("Enregistré dans ce navigateur le " + fmt(state.updatedAt) + ".");
   } catch (e) {
     storageOk = false;
-    setSaveBar("Enregistrement automatique impossible dans ce navigateur (navigation privée ou stockage bloqué). Exporte ton fichier régulièrement pour ne rien perdre.", true);
+    setSaveBar("Enregistrement automatique impossible dans ce navigateur (navigation privée ou stockage bloqué). Exporter le fichier régulièrement pour ne rien perdre.", true);
   }
 }
 function scheduleSave() { setSaveBar("Enregistrement…"); clearTimeout(saveTimer); saveTimer = setTimeout(saveNow, 400); }
@@ -212,7 +212,7 @@ function renderExportSummary() {
 $("#export-btn").addEventListener("click", function () {
   var msg = $("#export-msg");
   if (!state.name.trim()) {
-    msg.className = "msg err"; msg.textContent = "Renseigne d'abord ton nom (onglet Mes réponses) : il identifie ton fichier.";
+    msg.className = "msg err"; msg.textContent = "Renseigner d'abord le nom (onglet Réponses) : il identifie le fichier.";
     return;
   }
   if (saveTimer) saveNow();
@@ -225,7 +225,7 @@ $("#export-btn").addEventListener("click", function () {
   setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
   try { localStorage.setItem(LAST_EXPORT_KEY, new Date().toISOString()); } catch (e) {}
   renderReminder();
-  msg.className = "msg ok"; msg.textContent = "Fichier téléchargé (" + ALL_IDS.filter(answered).length + " réponses). Retrouve-le dans ton dossier Téléchargements.";
+  msg.className = "msg ok"; msg.textContent = "Fichier téléchargé (" + ALL_IDS.filter(answered).length + " réponses). Il se trouve dans le dossier Téléchargements.";
 });
 
 /* ------------------------------------------------------------ Import */
@@ -302,10 +302,10 @@ renderTrame();
 renderExportSummary();
 renderClear(false);
 route();
-if (!storageOk) setSaveBar("Ce navigateur bloque l'enregistrement automatique. Exporte ton fichier régulièrement.", true);
+if (!storageOk) setSaveBar("Ce navigateur bloque l'enregistrement automatique. Exporter le fichier régulièrement.", true);
 else if (state.updatedAt) setSaveBar("Réponses retrouvées (dernier enregistrement le " + fmt(state.updatedAt) + ").");
 else {
-  try { localStorage.setItem("mps-probe", "1"); localStorage.removeItem("mps-probe"); setSaveBar("Tes réponses s'enregistrent automatiquement dans ce navigateur."); }
-  catch (e) { storageOk = false; setSaveBar("Ce navigateur bloque l'enregistrement automatique (navigation privée ?). Exporte ton fichier régulièrement.", true); }
+  try { localStorage.setItem("mps-probe", "1"); localStorage.removeItem("mps-probe"); setSaveBar("Les réponses sont enregistrées automatiquement dans ce navigateur."); }
+  catch (e) { storageOk = false; setSaveBar("Ce navigateur bloque l'enregistrement automatique (navigation privée ?). Exporter le fichier régulièrement.", true); }
 }
 })();

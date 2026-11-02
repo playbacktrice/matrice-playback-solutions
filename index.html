@@ -23,7 +23,7 @@
     </a>
     <nav class="tabs" aria-label="Sections">
       <a href="#accueil" data-v="accueil">La démarche</a>
-      <a href="#trame" data-v="trame">Mes réponses <span class="count" id="progress-count">0/29</span></a>
+      <a href="#trame" data-v="trame">Réponses <span class="count" id="progress-count">0/29</span></a>
       <a href="#fichier" data-v="fichier">Sauvegarder</a>
       <a href="#commun" data-v="commun">Mise en commun</a>
     </nav>
@@ -37,17 +37,17 @@
     <div class="hero">
       <div class="eyebrow">Démarche de rapprochement · Playback Solutions</div>
       <h1>Matrice Playback Solutions</h1>
-      <p class="lead">Un cadre commun pour voir comment nous pourrions travailler ensemble. Chacun répond de son côté, sur la même trame, puis nous mettons nos réponses en commun le même jour, à la même heure.</p>
+      <p class="lead">Un cadre commun pour examiner les possibilités de collaboration. Chaque participant répond séparément, sur une trame identique. Les réponses sont mises en commun à une date et une heure fixées.</p>
       <div class="row">
-        <a class="btn primary" href="#trame">Commencer mes réponses</a>
+        <a class="btn primary" href="#trame">Accéder à la trame</a>
         <span class="date">Mise en commun : <b>lundi 16 novembre 2026 à 11 h</b></span>
       </div>
     </div>
 
     <div class="grid3">
-      <div class="step"><span class="n">1</span><h3>Je réponds</h3><p>Une réponse libre par sous-catégorie. Pas besoin de tout remplir d'un coup, ni d'avoir une vision arrêtée.</p></div>
-      <div class="step"><span class="n">2</span><h3>Mes réponses restent chez moi</h3><p>Elles sont enregistrées automatiquement dans ce navigateur, sur mon ordinateur. Personne d'autre ne les voit, pas même l'organisateur.</p></div>
-      <div class="step"><span class="n">3</span><h3>Je transmets le 16 novembre</h3><p>J'exporte mon fichier de réponses et je l'envoie à l'heure prévue. Toutes les réponses sont publiées en même temps.</p></div>
+      <div class="step"><span class="n">1</span><h3>Saisie des réponses</h3><p>Une réponse libre par sous-catégorie. La saisie peut se faire en plusieurs fois ; une vision arrêtée n'est pas requise.</p></div>
+      <div class="step"><span class="n">2</span><h3>Conservation locale</h3><p>Les réponses sont enregistrées automatiquement dans ce navigateur, sur cet ordinateur. Elles ne sont visibles par aucun autre participant, ni par l'organisateur.</p></div>
+      <div class="step"><span class="n">3</span><h3>Transmission le 16 novembre</h3><p>À partir de l'heure d'ouverture, chaque participant transmet ses réponses depuis l'onglet « Mise en commun ». Les réponses deviennent alors consultables par l'ensemble des participants.</p></div>
     </div>
 
     <div class="prose">
@@ -60,16 +60,16 @@
       <div class="note">
         <h3>Bon à savoir</h3>
         <ul>
-          <li>Les réponses sont liées à <b>ce navigateur sur cet ordinateur</b>. Si tu changes d'ordinateur ou de navigateur, exporte ton fichier puis réimporte-le.</li>
-          <li>Exporte régulièrement ton fichier : vider l'historique ou les données du navigateur efface les réponses.</li>
-          <li>Le nom que tu saisis sert à identifier ton fichier. Ce n'est pas une connexion sécurisée : lors de la transmission définitive, ton fichier sera rattaché à ton compte vérifié.</li>
+          <li>Les réponses sont liées à <b>ce navigateur sur cet ordinateur</b>. En cas de changement d'ordinateur ou de navigateur, exporter le fichier puis le réimporter.</li>
+          <li>Une sauvegarde régulière du fichier est recommandée : l'effacement de l'historique ou des données du navigateur supprime les réponses.</li>
+          <li>Le nom saisi identifie le fichier. Il ne constitue pas une authentification : lors de la transmission, les réponses sont rattachées au compte vérifié du participant.</li>
         </ul>
       </div>
       <div class="note ai">
         <h3><span class="ai-badge">IA</span> Utilisation de l'intelligence artificielle</h3>
         <ul>
-          <li><b>Sur cette page, aucune fonctionnalité n'utilise l'IA.</b> Tes réponses ne sont envoyées nulle part tant que tu ne transmets pas ton fichier.</li>
-          <li>Après le 16 novembre, une <b>synthèse</b> des réponses pourra être mise en forme par une IA (Claude). Tout contenu produit par l'IA portera le badge <span class="ai-badge">IA</span> pour le distinguer des réponses écrites par les participants.</li>
+          <li><b>Sur cette page, aucune fonctionnalité n'utilise l'IA.</b> Aucune réponse n'est envoyée avant sa transmission volontaire.</li>
+          <li>Après le 16 novembre, une <b>synthèse</b> des réponses sera générée par une IA (Claude). Tout contenu produit par l'IA porte le badge <span class="ai-badge">IA</span> pour le distinguer des réponses écrites par les participants.</li>
         </ul>
       </div>
     </div>
@@ -78,9 +78,9 @@
   <!-- TRAME -->
   <section class="wrap view" id="v-trame" hidden>
     <div class="namebox">
-      <label for="p-name">Ton nom et ta structure</label>
+      <label for="p-name">Nom et structure</label>
       <input id="p-name" type="text" maxlength="120" autocomplete="name" placeholder="Ex. : Prénom Nom — Société">
-      <p class="muted small">Associé à tes réponses et à ton fichier d'export.</p>
+      <p class="muted small">Associé aux réponses et au fichier d'export.</p>
     </div>
     <div class="savebar"><span id="savebar" role="status" aria-live="polite"></span> <span id="backup-reminder" class="reminder"></span></div>
     <div class="layout">
@@ -93,18 +93,18 @@
   <section class="wrap view" id="v-fichier" hidden>
     <div class="prose">
       <h2>Sauvegarder et transmettre</h2>
-      <p>Ton fichier contient ton nom et toutes tes réponses. Garde-le en lieu sûr : c'est aussi ta sauvegarde.</p>
+      <p>Le fichier d'export contient le nom et l'ensemble des réponses. Il constitue également la sauvegarde ; il est à conserver en lieu sûr.</p>
     </div>
     <div class="cards2">
       <div class="card">
-        <h3>Exporter mes réponses</h3>
+        <h3>Exporter les réponses</h3>
         <p class="muted" id="export-summary"></p>
-        <button type="button" class="btn primary" id="export-btn">Télécharger mon fichier (.json)</button>
+        <button type="button" class="btn primary" id="export-btn">Télécharger le fichier (.json)</button>
         <p class="msg" id="export-msg" role="status"></p>
       </div>
       <div class="card">
         <h3>Réimporter un fichier</h3>
-        <p class="muted">Pour reprendre tes réponses sur un autre ordinateur ou navigateur, ou après avoir effacé les données.</p>
+        <p class="muted">Pour reprendre les réponses sur un autre ordinateur ou navigateur, ou après un effacement des données.</p>
         <input type="file" id="import-file" accept=".json,application/json" hidden>
         <button type="button" class="btn" id="import-btn">Choisir un fichier…</button>
         <div id="import-confirm" class="confirm" hidden></div>
@@ -112,8 +112,8 @@
       </div>
     </div>
     <div class="card danger-zone">
-      <h3>Effacer mes réponses de ce navigateur</h3>
-      <p class="muted">Exporte d'abord ton fichier si tu veux les garder.</p>
+      <h3>Effacer les réponses de ce navigateur</h3>
+      <p class="muted">Exporter le fichier au préalable pour les conserver.</p>
       <div class="row" id="clear-row"><button type="button" class="btn danger" id="clear-btn">Effacer</button></div>
     </div>
   </section>
@@ -121,13 +121,13 @@
   <section class="wrap view" id="v-commun" hidden>
     <div class="prose">
       <h2>Mise en commun</h2>
-      <p>Ouverture le <b>lundi 16 novembre 2026 à 11 h</b> (heure de Paris, contrôlée par le serveur). À partir de ce moment, chaque participant transmet son fichier une seule fois, et tous les participants consultent les réponses transmises, au fur et à mesure.</p>
+      <p>Ouverture le <b>lundi 16 novembre 2026 à 11 h</b> (heure de Paris, contrôlée par le serveur). À partir de ce moment, chaque participant transmet ses réponses une seule fois ; l'ensemble des participants consulte les réponses transmises, au fur et à mesure.</p>
     </div>
     <div id="commun-root"><p class="muted">Chargement…</p></div>
   </section>
 </main>
 
-<footer class="wrap foot">Matrice Playback Solutions · réponses enregistrées dans ce navigateur jusqu'à leur transmission · aucune fonctionnalité de ce site n'utilise l'IA ; une synthèse mise en forme par IA est toujours signalée par le badge <span class="ai-badge">IA</span></footer>
+<footer class="wrap foot">Matrice Playback Solutions · réponses enregistrées dans ce navigateur jusqu'à leur transmission · aucune fonctionnalité de ce site n'utilise l'IA ; une synthèse générée par IA est toujours signalée par le badge <span class="ai-badge">IA</span></footer>
 
 <script src="trame.js"></script>
 <script src="app.js"></script>
