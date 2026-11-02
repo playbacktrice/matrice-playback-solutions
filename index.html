@@ -9,6 +9,8 @@
   // Thème appliqué avant l'affichage pour éviter un flash
   try { var t = localStorage.getItem("mps-theme"); if (t === "dark" || t === "light") document.documentElement.dataset.theme = t; } catch (e) {}
 </script>
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -16,13 +18,14 @@
 <header class="top">
   <div class="wrap bar">
     <a class="brand" href="#accueil" aria-label="Accueil">
-      <img src="assets/logo.svg" alt="Playback Solutions" class="logo" id="logo" onerror="this.hidden=true;document.getElementById('logo-txt').hidden=false">
-      <span class="logo-txt" id="logo-txt" hidden>Playback Solutions</span>
+      <img src="assets/logo-noir.png" alt="Playback Solutions" class="logo logo-light" width="235" height="36">
+      <img src="assets/logo-blanc.png" alt="" class="logo logo-dark" width="235" height="36" aria-hidden="true">
     </a>
     <nav class="tabs" aria-label="Sections">
       <a href="#accueil" data-v="accueil">La démarche</a>
       <a href="#trame" data-v="trame">Mes réponses <span class="count" id="progress-count">0/29</span></a>
-      <a href="#fichier" data-v="fichier">Sauvegarder / transmettre</a>
+      <a href="#fichier" data-v="fichier">Sauvegarder</a>
+      <a href="#commun" data-v="commun">Mise en commun</a>
     </nav>
     <button type="button" class="theme" id="theme-btn" aria-label="Changer de thème"></button>
   </div>
@@ -79,7 +82,7 @@
       <input id="p-name" type="text" maxlength="120" autocomplete="name" placeholder="Ex. : Prénom Nom — Société">
       <p class="muted small">Associé à tes réponses et à ton fichier d'export.</p>
     </div>
-    <div class="savebar" id="savebar" role="status" aria-live="polite"></div>
+    <div class="savebar"><span id="savebar" role="status" aria-live="polite"></span> <span id="backup-reminder" class="reminder"></span></div>
     <div class="layout">
       <nav class="toc" id="toc" aria-label="Sommaire"></nav>
       <div class="cats-body" id="trame-body"></div>
@@ -114,11 +117,22 @@
       <div class="row" id="clear-row"><button type="button" class="btn danger" id="clear-btn">Effacer</button></div>
     </div>
   </section>
+  <!-- MISE EN COMMUN (nécessite un compte) -->
+  <section class="wrap view" id="v-commun" hidden>
+    <div class="prose">
+      <h2>Mise en commun</h2>
+      <p>Ouverture le <b>lundi 16 novembre 2026 à 11 h</b> (heure de Paris, contrôlée par le serveur). À partir de ce moment, chaque participant transmet son fichier une seule fois, et tous les participants consultent les réponses transmises, au fur et à mesure.</p>
+    </div>
+    <div id="commun-root"><p class="muted">Chargement…</p></div>
+  </section>
 </main>
 
-<footer class="wrap foot">Matrice Playback Solutions · réponses enregistrées uniquement dans ce navigateur · aucune fonctionnalité IA sur cette page</footer>
+<footer class="wrap foot">Matrice Playback Solutions · réponses enregistrées dans ce navigateur jusqu'à leur transmission · aucune fonctionnalité de ce site n'utilise l'IA ; une synthèse mise en forme par IA est toujours signalée par le badge <span class="ai-badge">IA</span></footer>
 
 <script src="trame.js"></script>
 <script src="app.js"></script>
+<script src="vendor/supabase-2.45.4.js"></script>
+<script src="config.js"></script>
+<script src="collective.js"></script>
 </body>
 </html>

@@ -70,7 +70,21 @@ window.addEventListener("storage", function (e) {
   state = load(); renderTrame(); renderProgress(); renderExportSummary();
   setSaveBar("Réponses mises à jour depuis un autre onglet.");
 });
-function setSaveBar(msg, err) { var b = $("#savebar"); b.textContent = msg; b.className = "savebar" + (err ? " err" : ""); }
+function setSaveBar(msg, err) { var b = $("#savebar"); b.textContent = msg; b.className = err ? "err" : ""; renderReminder(); }
+
+/* Rappel discret de sauvegarde : date du dernier export, stockée à part (le format JSON ne change pas) */
+var LAST_EXPORT_KEY = "mps-dernier-export";
+function lastExport() { try { return localStorage.getItem(LAST_EXPORT_KEY); } catch (e) { return null; } }
+function renderReminder() {
+  var r = $("#backup-reminder"); if (!r) return;
+  var hasAnswers = ALL_IDS.some(function (id) { return state.answers[id] && state.answers[id].trim(); });
+  if (!hasAnswers) { r.replaceChildren(); return; }
+  var le = lastExport();
+  var stale = !le || (state.updatedAt && new Date(state.updatedAt) > new Date(le));
+  r.replaceChildren(
+    document.createTextNode(le ? "· Dernière sauvegarde téléchargée le " + fmt(le) + (stale ? " (modifications depuis). " : ". ") : "· Aucune sauvegarde téléchargée pour l'instant. "),
+    stale ? el("a", { href: "#fichier", text: "Télécharger une sauvegarde" }) : "");
+}
 
 /* ------------------------------------------------------------ Thème */
 function currentTheme() {
@@ -87,10 +101,11 @@ $("#theme-btn").addEventListener("click", function () {
 });
 
 /* ------------------------------------------------------------ Navigation */
-var VIEWS = ["accueil", "trame", "fichier"];
+var VIEWS = ["accueil", "trame", "fichier", "commun"];
 function route() {
   var h = location.hash.slice(1), v = VIEWS.indexOf(h) >= 0 ? h : "accueil";
   if (h.indexOf("q-") === 0 || /^c\d$/.test(h)) v = "trame";
+  if (h.indexOf("access_token=") >= 0 || h.indexOf("error=") >= 0) v = "commun"; // retour d'un lien de connexion
   VIEWS.forEach(function (x) { $("#v-" + x).hidden = x !== v; });
   document.querySelectorAll(".tabs a").forEach(function (a) {
     if (a.dataset.v === v) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
@@ -208,6 +223,8 @@ $("#export-btn").addEventListener("click", function () {
   var a = el("a", { href: URL.createObjectURL(blob), download: "matrice-playback-solutions_" + (slug(state.name) || "reponses") + "_" + stamp + ".json" });
   document.body.append(a); a.click(); a.remove();
   setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+  try { localStorage.setItem(LAST_EXPORT_KEY, new Date().toISOString()); } catch (e) {}
+  renderReminder();
   msg.className = "msg ok"; msg.textContent = "Fichier téléchargé (" + ALL_IDS.filter(answered).length + " réponses). Retrouve-le dans ton dossier Téléchargements.";
 });
 
@@ -276,6 +293,9 @@ function renderClear(confirming) {
 }
 
 /* ------------------------------------------------------------ Démarrage */
+// Accès en lecture seule pour la mise en commun (collective.js) : aucune écriture dans le stockage local
+window.MPS_LOCAL = { buildExport: buildExport, answeredCount: function () { return ALL_IDS.filter(answered).length; } };
+
 renderThemeBtn();
 renderCatList();
 renderTrame();
