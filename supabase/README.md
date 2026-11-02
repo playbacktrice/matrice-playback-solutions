@@ -5,6 +5,6 @@
 - `tests/20_tests_serveur.sql` : contrôles sur le serveur réel, auto-annulés (aucune trace).
 
 Ouverture : `settings.opens_at` = 16/11/2026 11:00 Europe/Paris (heure du serveur).
-Comptes : créés par l'administrateur (Authentication → Users → Add user). Chaque compte devient
-automatiquement participant ; nom affiché et rôle dans la table `participants`.
+Comptes : créés par l'administrateur (Authentication → Users → Add user). Chaque compte est créé
+INACTIF dans `participants` : l'activer (active = true) et renseigner son nom affiché.
 Réponses transmises : une par participant, jamais modifiables depuis l'application.
