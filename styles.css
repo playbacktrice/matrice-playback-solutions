@@ -201,3 +201,4 @@ textarea.short{min-height:80px}
 .st-alert.warn{color:var(--warn);background:transparent;border:1px solid currentColor}
 .st-alert.ok{color:var(--ok);border:1px solid currentColor}
 .st-line b{color:var(--fg);font-weight:600}
+.step-action{margin-top:10px}
