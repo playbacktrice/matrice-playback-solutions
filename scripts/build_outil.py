@@ -13,7 +13,7 @@ for js in ("trame.js", "questionnaire.js"):
 for img in ("assets/logo-noir.png", "assets/logo-blanc.png", "assets/favicon.png"):
     html = html.replace(f'"{img}"', '"' + data_uri(img) + '"')
 assert "src=\"" not in re.sub(r'src="data:[^"]+"', "", html), "ressource externe restante"
-assert not re.search(r"https?://(?!playbacktrice\.github\.io/matrice-playback-solutions/)", html.replace("http://www.w3.org", "")), "URL externe inattendue"
+assert not re.search(r"https?://(?!playbacktrice\.github\.io/matrice-playback-solutions/(#commun)?\")", html.replace("http://www.w3.org", "")), "URL externe inattendue"
 out_dir = root / "outil"; out_dir.mkdir(exist_ok=True)
 name = "Demarche-de-rapprochement"
 html_name = "Ouvrir - Démarche de rapprochement.html"
