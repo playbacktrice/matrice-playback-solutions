@@ -191,42 +191,49 @@ document.addEventListener("visibilitychange", function () {
   if (document.hidden) { if (saveTimer) saveLocal(); if (autoActive && dirty()) writeFile(); }
 });
 // Avertissement à la fermeture : le navigateur affiche son propre message générique
-window.addEventListener("beforeunload", function (e) {
+// Le message doit être NON vide : Safari (et l'ancien comportement de Chrome/Edge) n'affiche l'avertissement
+// que si returnValue contient une chaîne. Les navigateurs affichent toutefois leur propre texte générique.
+var LEAVE_MSG = "Des modifications ne sont pas enregistrées dans votre fichier JSON.";
+window.onbeforeunload = function (e) {
   if (saveTimer) saveLocal();
-  if (dirty()) { e.preventDefault(); e.returnValue = ""; return ""; }
-});
+  if (!dirty()) return undefined;       // fichier JSON à jour : aucun avertissement
+  if (e) { e.preventDefault(); e.returnValue = LEAVE_MSG; }
+  return LEAVE_MSG;
+};
 
 /* ------------------------------------------------------------ Barre de sauvegarde */
 var flashTimer = null;
+var BASE_TITLE = document.title;
 function flash(text, kind) {
   var m = $("#save-msg"); m.textContent = text; m.className = "msg " + (kind || "");
   clearTimeout(flashTimer); flashTimer = setTimeout(function () { m.textContent = ""; }, 8000);
 }
 function renderStatus() {
-  var local = $("#st-local"), file = $("#st-file"), actions = $("#st-actions");
+  var local = $("#st-local"), file = $("#st-file"), alert = $("#st-alert"), actions = $("#st-actions");
   if (!local) return;
-  local.className = "st-line " + (storageOk ? "ok" : "err");
-  local.textContent = storageOk
-    ? (state.updatedAt ? "Réponses enregistrées localement sur votre ordinateur (" + hm(state.updatedAt) + ")." : "Les réponses sont enregistrées localement sur votre ordinateur au fil de la saisie.")
-    : "Ce navigateur bloque l'enregistrement local (navigation privée ?). Téléchargez une sauvegarde régulièrement.";
-
-  var lf = lastFileSave(), d = dirty(), parts = [];
-  if (autoActive && handle) {
-    file.className = "st-line ok";
-    parts.push("Sauvegarde automatique active dans « " + handle.name + " »");
-    parts.push(lastAutoWrite ? " — dernière écriture à " + hm(lastAutoWrite) : "");
-    parts.push(d ? ". Modifications en attente : écriture dans moins de 2 minutes." : ". Fichier à jour.");
-  } else if (autoError) {
-    file.className = "st-line err"; parts.push(autoError);
-  } else if (handle && !autoActive) {
-    file.className = "st-line warn"; parts.push("Sauvegarde automatique en pause : le navigateur demande de réautoriser l'écriture dans « " + handle.name + " ».");
-  } else {
-    file.className = "st-line " + (d ? "warn" : "");
-    if (!FSA) parts.push("Sauvegarde automatique dans un fichier indisponible dans ce navigateur. ");
-    else parts.push("Sauvegarde automatique dans un fichier non activée. ");
-    parts.push(lf ? "Dernière sauvegarde dans un fichier : " + fmt(lf) + (d ? " — modifications non sauvegardées depuis." : ".") : (hasContent() ? "Aucune sauvegarde dans un fichier pour l'instant." : ""));
-  }
-  file.textContent = parts.join("");
+  // 1. Enregistrement local (ne vaut PAS sauvegarde du fichier JSON)
+  local.className = "st-line " + (storageOk ? "" : "err");
+  local.replaceChildren(el("b", { text: "Enregistrement local : " }), storageOk
+    ? (state.updatedAt ? "à jour (" + fmt(state.updatedAt) + "). Conservé sur cet ordinateur, dans ce navigateur uniquement." : "actif au fil de la saisie, sur cet ordinateur.")
+    : "bloqué par ce navigateur (navigation privée ?). Seul le fichier JSON conserve vos réponses.");
+  // 2. Fichier JSON : dernière sauvegarde effective
+  var lf = lastFileSave(), d = dirty(), mode;
+  if (autoActive && handle) mode = "sauvegarde automatique active dans « " + handle.name + " » (toutes les 2 minutes en cas de modification)";
+  else if (handle && !autoActive) mode = "sauvegarde automatique en pause : réautorisation nécessaire pour « " + handle.name + " »";
+  else if (FSA) mode = "sauvegarde automatique non activée";
+  else mode = "sauvegarde automatique indisponible dans ce navigateur, sauvegarde manuelle uniquement";
+  file.className = "st-line" + (autoError ? " err" : "");
+  file.replaceChildren(el("b", { text: "Fichier JSON : " }),
+    lf ? "dernière sauvegarde le " + fmt(lf) + " — " : "aucune sauvegarde pour l'instant — ", autoError || mode + ".");
+  // 3. Alerte : modifications non enregistrées dans le fichier JSON
+  if (d) {
+    alert.className = "st-alert warn";
+    alert.textContent = "⚠ Modifications non enregistrées dans votre fichier JSON" +
+      (autoActive && handle ? " : écriture automatique dans moins de 2 minutes." : ". Téléchargez une sauvegarde avant de fermer l'outil.");
+  } else if (lf && hasContent()) {
+    alert.className = "st-alert ok"; alert.textContent = "✓ Fichier JSON à jour.";
+  } else { alert.className = "st-alert"; alert.textContent = ""; }
+  document.title = (d ? "● " : "") + BASE_TITLE;
 
   var btns = [];
   if (FSA && !handle) btns.push(el("button", { type: "button", class: "btn primary", text: "Activer la sauvegarde automatique…", onclick: chooseFile }));

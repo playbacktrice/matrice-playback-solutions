@@ -196,3 +196,8 @@ textarea.short{min-height:80px}
 .dl-row{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
 @media (min-width:701px){.cmp-cell .who{display:none}}
 @media (max-width:700px){.cmp-grid{grid-template-columns:1fr !important}.cmp-head{display:none}}
+.st-alert{margin:0;font-weight:600;font-size:15px;border-radius:8px;padding:8px 12px}
+.st-alert:empty{display:none}
+.st-alert.warn{color:var(--warn);background:transparent;border:1px solid currentColor}
+.st-alert.ok{color:var(--ok);border:1px solid currentColor}
+.st-line b{color:var(--fg);font-weight:600}

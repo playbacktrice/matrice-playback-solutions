@@ -50,8 +50,9 @@
     </div>
 
     <div class="savepanel" aria-label="Sauvegarde">
-      <p class="st-line" id="st-local" role="status"></p>
-      <p class="st-line" id="st-file" role="status"></p>
+      <p class="st-alert" id="st-alert" role="status" aria-live="polite"></p>
+      <p class="st-line" id="st-file"></p>
+      <p class="st-line" id="st-local"></p>
       <div class="row" id="st-actions"></div>
       <input type="file" id="import-file" accept=".json,application/json" hidden>
       <div id="import-confirm" class="confirm" hidden></div>
