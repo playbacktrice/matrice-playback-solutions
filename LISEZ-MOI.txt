@@ -18,7 +18,7 @@ Outil de saisie hors ligne
      enregistrer le fichier JSON. Il est ensuite mis à jour toutes les 2 minutes en cas
      de modification. À chaque réouverture de l'outil, cliquer sur « Réactiver la
      sauvegarde automatique ».
-   - Safari, Firefox ou autre : cliquer régulièrement sur « Télécharger une sauvegarde ».
+   - Safari, Firefox ou autre : cliquer régulièrement sur « Télécharger une sauvegarde .json ».
      Chaque clic crée un nouveau fichier dans Téléchargements ; le plus récent fait foi.
    Pour reprendre sur un autre ordinateur : « Importer un fichier… ».
 

@@ -209,24 +209,15 @@ function flash(text, kind) {
   clearTimeout(flashTimer); flashTimer = setTimeout(function () { m.textContent = ""; }, 8000);
 }
 function renderStatus() {
-  var local = $("#st-local"), file = $("#st-file"), alert = $("#st-alert"), actions = $("#st-actions");
-  if (!local) return;
-  // 1. Enregistrement local (ne vaut PAS sauvegarde du fichier JSON)
-  local.className = "st-line " + (storageOk ? "" : "err");
-  local.replaceChildren(el("b", { text: "Enregistrement local : " }), storageOk
-    ? (state.updatedAt ? "à jour (" + fmt(state.updatedAt) + "). Conservé sur cet ordinateur, dans ce navigateur uniquement." : "actif au fil de la saisie, sur cet ordinateur.")
-    : "bloqué par ce navigateur (navigation privée ?). Seul le fichier JSON conserve vos réponses.");
-  // 2. Fichier JSON : dernière sauvegarde effective
-  var lf = lastFileSave(), d = dirty(), mode;
-  if (autoActive && handle) mode = "sauvegarde automatique active dans « " + handle.name + " » (toutes les 2 minutes en cas de modification)";
-  else if (handle && !autoActive) mode = "sauvegarde automatique en pause : réautorisation nécessaire pour « " + handle.name + " »";
-  else if (FSA) mode = "sauvegarde automatique non activée";
-  else mode = "sauvegarde automatique indisponible dans ce navigateur, sauvegarde manuelle uniquement";
-  file.className = "st-line" + (autoError ? " err" : "");
-  file.replaceChildren(el("b", { text: "Fichier JSON : " }),
-    lf ? "dernière sauvegarde le " + fmt(lf) + " — " : "aucune sauvegarde pour l'instant — ", autoError || mode + ".");
-  // 3. Alerte : modifications non enregistrées dans le fichier JSON
-  if (d) {
+  var alert = $("#st-alert"), actions = $("#st-actions");
+  if (!alert) return;
+  var lf = lastFileSave(), d = dirty();
+  // Alerte unique : erreurs éventuelles, puis modifications non enregistrées dans le fichier JSON
+  if (autoError) {
+    alert.className = "st-alert err"; alert.textContent = "⚠ " + autoError;
+  } else if (!storageOk) {
+    alert.className = "st-alert err"; alert.textContent = "⚠ Ce navigateur bloque l'enregistrement local (navigation privée ?). Seul le fichier JSON conserve vos réponses.";
+  } else if (d) {
     alert.className = "st-alert warn";
     alert.textContent = "⚠ Modifications non enregistrées dans votre fichier JSON" +
       (autoActive && handle ? " : écriture automatique dans moins de 2 minutes." : ". Téléchargez une sauvegarde avant de fermer l'outil.");
@@ -239,7 +230,7 @@ function renderStatus() {
   if (FSA && !handle) btns.push(el("button", { type: "button", class: "btn primary", text: "Activer la sauvegarde automatique…", onclick: chooseFile }));
   if (FSA && handle && !autoActive) btns.push(el("button", { type: "button", class: "btn primary", text: "Réactiver la sauvegarde automatique", onclick: reactivate }));
   if (FSA && handle && autoActive) btns.push(el("button", { type: "button", class: "btn", text: "Enregistrer maintenant", onclick: function () { writeFile().then(function (ok) { if (ok) flash("Fichier enregistré.", "ok"); }); } }));
-  btns.push(el("button", { type: "button", class: "btn" + (FSA ? "" : " primary"), text: "Télécharger une sauvegarde", onclick: download }));
+  btns.push(el("button", { type: "button", class: "btn" + (FSA ? "" : " primary"), text: "Télécharger une sauvegarde .json", onclick: download }));
   btns.push(el("button", { type: "button", class: "btn", text: "Importer un fichier…", onclick: function () { $("#import-file").value = ""; $("#import-file").click(); } }));
   if (FSA && handle) btns.push(el("button", { type: "button", class: "btn link", text: "Changer de fichier", onclick: function () { stopAuto(); chooseFile(); } }));
   actions.replaceChildren.apply(actions, btns);
