@@ -173,7 +173,7 @@ function renderClosed() {
   show(header(), el("div", { class: "card" },
     el("h3", { text: "La mise en commun n'est pas encore ouverte" }),
     el("p", {}, "Ouverture le ", el("b", { text: fmt(status.opens_at) }), " (heure du serveur). Temps restant : ", count),
-    el("p", { class: "muted", text: "Aucune réponse n'est accessible avant cette heure. D'ici là, les réponses restent dans le navigateur de chaque participant ; une sauvegarde régulière est recommandée (onglet « Sauvegarder »)." })),
+    el("p", { class: "muted", text: "Aucune réponse n'est accessible avant cette heure. D'ici là, les réponses restent dans le navigateur de chaque participant. Nous vous recommandons de sauvegarder régulièrement vos réponses dans un fichier JSON depuis l'outil de saisie hors ligne." })),
     diff > 0 ? null : msg("Ouverture imminente…"));
 }
 
