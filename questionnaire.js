@@ -231,7 +231,7 @@ function renderStatus() {
   if (FSA && !handle) btns.push(el("button", { type: "button", class: "btn primary", text: "Activer la sauvegarde automatique…", onclick: chooseFile }));
   if (FSA && handle && !autoActive) btns.push(el("button", { type: "button", class: "btn primary", text: "Réactiver la sauvegarde automatique", onclick: reactivate }));
   if (FSA && handle && autoActive) btns.push(el("button", { type: "button", class: "btn", text: "Enregistrer maintenant", onclick: function () { writeFile().then(function (ok) { if (ok) flash("Fichier JSON enregistré.", "ok"); }); } }));
-  btns.push(el("button", { type: "button", class: "btn" + (FSA ? "" : " primary"), text: "Télécharger une sauvegarde .json", onclick: download }));
+  btns.push(el("button", { type: "button", class: "btn" + (FSA ? "" : " primary"), text: "Télécharger une sauvegarde JSON", onclick: download }));
   btns.push(el("button", { type: "button", class: "btn", text: "Importer un fichier JSON…", onclick: function () { $("#import-file").value = ""; $("#import-file").click(); } }));
   if (FSA && handle) btns.push(el("button", { type: "button", class: "btn link", text: "Changer de fichier JSON", onclick: function () { stopAuto(); chooseFile(); } }));
   actions.replaceChildren.apply(actions, btns);
