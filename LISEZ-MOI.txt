@@ -20,7 +20,7 @@ Outil de saisie hors ligne
      sauvegarde automatique ».
    - Safari, Firefox ou autre : cliquer régulièrement sur « Télécharger une sauvegarde .json ».
      Chaque clic crée un nouveau fichier dans Téléchargements ; le plus récent fait foi.
-   Pour reprendre sur un autre ordinateur : « Importer un fichier… ».
+   Pour reprendre sur un autre ordinateur : « Importer un fichier JSON… ».
 
 4. TRANSMETTRE — lundi 16 novembre 2026 à partir de 11 h
    Se connecter sur https://playbacktrice.github.io/matrice-playback-solutions/

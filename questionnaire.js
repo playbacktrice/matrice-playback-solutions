@@ -173,17 +173,17 @@ function writeFile() {
   });
 }
 function chooseFile() {
-  window.showSaveFilePicker({ suggestedName: fileName(), types: [{ description: "Fichier de réponses", accept: { "application/json": [".json"] } }] })
+  window.showSaveFilePicker({ suggestedName: fileName(), types: [{ description: "Fichier JSON de réponses", accept: { "application/json": [".json"] } }] })
     .then(function (h) { handle = h; return storeHandle(h).then(writeFile); })
     .then(function (ok) { if (ok) flash("Sauvegarde automatique activée dans « " + handle.name + " ».", "ok"); })
-    .catch(function (e) { if (e && e.name !== "AbortError") { autoError = "Impossible d'utiliser ce fichier."; renderStatus(); } });
+    .catch(function (e) { if (e && e.name !== "AbortError") { autoError = "Impossible d'utiliser ce fichier JSON."; renderStatus(); } });
 }
 function reactivate() {
   if (!handle) return;
   handle.requestPermission({ mode: "readwrite" }).then(function (p) {
     if (p === "granted") return writeFile().then(function (ok) { if (ok) flash("Sauvegarde automatique réactivée.", "ok"); });
     autoError = "Autorisation refusée : la sauvegarde automatique reste inactive."; renderStatus();
-  }).catch(function () { autoError = "Le fichier n'est plus accessible. Choisissez un fichier de sauvegarde."; handle = null; storeHandle(null); renderStatus(); });
+  }).catch(function () { autoError = "Le fichier JSON n'est plus accessible. Choisissez un nouveau fichier JSON."; handle = null; storeHandle(null); renderStatus(); });
 }
 function stopAuto() { handle = null; autoActive = false; autoError = null; storeHandle(null); renderStatus(); }
 setInterval(function () { if (autoActive && dirty()) writeFile(); }, AUTOSAVE_MS);
@@ -193,7 +193,7 @@ document.addEventListener("visibilitychange", function () {
 // Avertissement à la fermeture : le navigateur affiche son propre message générique
 // Le message doit être NON vide : Safari (et l'ancien comportement de Chrome/Edge) n'affiche l'avertissement
 // que si returnValue contient une chaîne. Les navigateurs affichent toutefois leur propre texte générique.
-var LEAVE_MSG = "Des modifications ne sont pas enregistrées dans votre fichier JSON.";
+var LEAVE_MSG = "Assurez-vous d'avoir téléchargé une sauvegarde de vos réponses au format JSON avant de quitter cette page.";
 window.onbeforeunload = function (e) {
   if (saveTimer) saveLocal();
   if (!dirty()) return undefined;       // fichier JSON à jour : aucun avertissement
@@ -219,8 +219,9 @@ function renderStatus() {
     alert.className = "st-alert err"; alert.textContent = "⚠ Ce navigateur bloque l'enregistrement local (navigation privée ?). Seul le fichier JSON conserve vos réponses.";
   } else if (d) {
     alert.className = "st-alert warn";
-    alert.textContent = "⚠ Modifications non enregistrées dans votre fichier JSON" +
-      (autoActive && handle ? " : écriture automatique dans moins de 2 minutes." : ". Téléchargez une sauvegarde avant de fermer l'outil.");
+    alert.textContent = "⚠ Modifications non sauvegardées dans votre fichier JSON" +
+      (autoActive && handle ? " (écriture automatique dans moins de 2 minutes)" : "") +
+      ". Pensez à télécharger une sauvegarde avant de quitter cette page.";
   } else if (lf && hasContent()) {
     alert.className = "st-alert ok"; alert.textContent = "✓ Fichier JSON à jour.";
   } else { alert.className = "st-alert"; alert.textContent = ""; }
@@ -231,7 +232,7 @@ function renderStatus() {
   if (FSA && handle && !autoActive) btns.push(el("button", { type: "button", class: "btn primary", text: "Réactiver la sauvegarde automatique", onclick: reactivate }));
   if (FSA && handle && autoActive) btns.push(el("button", { type: "button", class: "btn", text: "Enregistrer maintenant", onclick: function () { writeFile().then(function (ok) { if (ok) flash("Fichier enregistré.", "ok"); }); } }));
   btns.push(el("button", { type: "button", class: "btn" + (FSA ? "" : " primary"), text: "Télécharger une sauvegarde .json", onclick: download }));
-  btns.push(el("button", { type: "button", class: "btn", text: "Importer un fichier…", onclick: function () { $("#import-file").value = ""; $("#import-file").click(); } }));
+  btns.push(el("button", { type: "button", class: "btn", text: "Importer un fichier JSON…", onclick: function () { $("#import-file").value = ""; $("#import-file").click(); } }));
   if (FSA && handle) btns.push(el("button", { type: "button", class: "btn link", text: "Changer de fichier", onclick: function () { stopAuto(); chooseFile(); } }));
   actions.replaceChildren.apply(actions, btns);
 
