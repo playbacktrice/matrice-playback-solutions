@@ -102,21 +102,21 @@ function slug(s) {
 function fileName() { return "reponses_" + (slug(state.name) || "participant") + ".json"; }
 
 function parseImport(data) {
-  if (!data || data.format !== FORMAT) throw new Error("Ce fichier n'est pas un fichier de réponses de la démarche.");
-  if (data.formatVersion !== FORMAT_VERSION) throw new Error("Version de fichier non prise en charge.");
-  if (!Array.isArray(data.categories)) throw new Error("Fichier incomplet : liste des réponses absente.");
+  if (!data || data.format !== FORMAT) throw new Error("Ce fichier n'est pas un fichier JSON de réponses de la démarche.");
+  if (data.formatVersion !== FORMAT_VERSION) throw new Error("Version de fichier JSON non prise en charge.");
+  if (!Array.isArray(data.categories)) throw new Error("Fichier JSON incomplet : liste des réponses absente.");
   var answers = {}, seen = {}, unknown = [];
   data.categories.forEach(function (c) {
-    if (!c || !Array.isArray(c.items)) throw new Error("Fichier endommagé : catégorie sans réponses.");
+    if (!c || !Array.isArray(c.items)) throw new Error("Fichier JSON endommagé : catégorie sans réponses.");
     c.items.forEach(function (i) {
-      if (!i || typeof i.id !== "string") throw new Error("Fichier endommagé : rubrique sans identifiant.");
-      if (typeof i.answer !== "string") throw new Error("Fichier endommagé : réponse illisible (" + (i.title || i.id) + ").");
-      if (seen[i.id]) throw new Error("Fichier endommagé : rubrique en double (" + (i.title || i.id) + ").");
+      if (!i || typeof i.id !== "string") throw new Error("Fichier JSON endommagé : rubrique sans identifiant.");
+      if (typeof i.answer !== "string") throw new Error("Fichier JSON endommagé : réponse illisible (" + (i.title || i.id) + ").");
+      if (seen[i.id]) throw new Error("Fichier JSON endommagé : rubrique en double (" + (i.title || i.id) + ").");
       seen[i.id] = true;
       if (KNOWN[i.id]) answers[i.id] = i.answer; else if (i.answer.trim()) unknown.push(i.title || i.id);
     });
   });
-  if (unknown.length) throw new Error("Rubriques inconnues dans le fichier (" + unknown.join(", ") + "). Import annulé pour ne rien perdre.");
+  if (unknown.length) throw new Error("Rubriques inconnues dans le fichier JSON (" + unknown.join(", ") + "). Import annulé pour ne rien perdre.");
   var p = data.participant || {};
   return { name: typeof p.name === "string" ? p.name : "", structure: typeof p.structure === "string" ? p.structure : "",
            answers: answers, updatedAt: data.updatedAt || data.exportedAt || null };
@@ -131,7 +131,7 @@ function download() {
   document.body.append(a); a.click(); a.remove();
   setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
   setLastFileSave(new Date().toISOString());
-  flash("Fichier téléchargé : " + fileName() + " (dossier Téléchargements).", "ok");
+  flash("Fichier JSON téléchargé : " + fileName() + " (dossier Téléchargements).", "ok");
   renderStatus();
 }
 
@@ -168,7 +168,7 @@ function writeFile() {
     autoActive = true; autoError = null; writing = false; renderStatus(); return true;
   }, function (err) {
     writing = false; autoActive = false;
-    autoError = "L'écriture dans le fichier a échoué (" + (err && err.name === "NotAllowedError" ? "autorisation retirée" : "fichier inaccessible") + "). La sauvegarde automatique est arrêtée.";
+    autoError = "L'écriture dans le fichier JSON a échoué (" + (err && err.name === "NotAllowedError" ? "autorisation retirée" : "fichier inaccessible") + "). La sauvegarde automatique est arrêtée.";
     renderStatus(); return false;
   });
 }
@@ -230,10 +230,10 @@ function renderStatus() {
   var btns = [];
   if (FSA && !handle) btns.push(el("button", { type: "button", class: "btn primary", text: "Activer la sauvegarde automatique…", onclick: chooseFile }));
   if (FSA && handle && !autoActive) btns.push(el("button", { type: "button", class: "btn primary", text: "Réactiver la sauvegarde automatique", onclick: reactivate }));
-  if (FSA && handle && autoActive) btns.push(el("button", { type: "button", class: "btn", text: "Enregistrer maintenant", onclick: function () { writeFile().then(function (ok) { if (ok) flash("Fichier enregistré.", "ok"); }); } }));
+  if (FSA && handle && autoActive) btns.push(el("button", { type: "button", class: "btn", text: "Enregistrer maintenant", onclick: function () { writeFile().then(function (ok) { if (ok) flash("Fichier JSON enregistré.", "ok"); }); } }));
   btns.push(el("button", { type: "button", class: "btn" + (FSA ? "" : " primary"), text: "Télécharger une sauvegarde .json", onclick: download }));
   btns.push(el("button", { type: "button", class: "btn", text: "Importer un fichier JSON…", onclick: function () { $("#import-file").value = ""; $("#import-file").click(); } }));
-  if (FSA && handle) btns.push(el("button", { type: "button", class: "btn link", text: "Changer de fichier", onclick: function () { stopAuto(); chooseFile(); } }));
+  if (FSA && handle) btns.push(el("button", { type: "button", class: "btn link", text: "Changer de fichier JSON", onclick: function () { stopAuto(); chooseFile(); } }));
   actions.replaceChildren.apply(actions, btns);
 
   var n = countAnswers(state.answers);
@@ -245,7 +245,7 @@ $("#import-file").addEventListener("change", function (e) {
   var file = e.target.files[0], box = $("#import-confirm");
   e.target.value = ""; box.hidden = true;
   if (!file) return;
-  if (file.size > 5 * 1024 * 1024) return flash("Fichier trop volumineux.", "err");
+  if (file.size > 5 * 1024 * 1024) return flash("Fichier JSON trop volumineux.", "err");
   var rd = new FileReader();
   rd.onload = function () {
     var p;
@@ -258,18 +258,18 @@ $("#import-file").addEventListener("change", function (e) {
       setLastFileSave(state.updatedAt);       // le contenu correspond exactement au fichier importé
       if (handle && autoActive) writeFile();
       renderTrame(); box.hidden = true;
-      flash("Fichier importé : " + n + " réponse" + (n > 1 ? "s" : "") + " sur " + REQUIRED.length + (o ? " et " + o + " commentaire" + (o > 1 ? "s" : "") : "") + (p.name ? " (" + p.name + ")" : "") + ".", "ok");
+      flash("Fichier JSON importé : " + n + " réponse" + (n > 1 ? "s" : "") + " sur " + REQUIRED.length + (o ? " et " + o + " commentaire" + (o > 1 ? "s" : "") : "") + (p.name ? " (" + p.name + ")" : "") + ".", "ok");
     };
     if (!cur && !state.name.trim() && !state.structure.trim()) return apply();
     box.replaceChildren(
-      el("span", { text: "Le fichier « " + file.name + " » (" + (p.name || "sans nom") + ", " + n + " réponse" + (n > 1 ? "s" : "") + (p.updatedAt ? ", modifié le " + fmt(p.updatedAt) : "") +
+      el("span", { text: "Le fichier JSON « " + file.name + " » (" + (p.name || "sans nom") + ", " + n + " réponse" + (n > 1 ? "s" : "") + (p.updatedAt ? ", modifié le " + fmt(p.updatedAt) : "") +
         ") va remplacer les réponses actuellement enregistrées sur cet ordinateur." }),
       el("div", { class: "row" },
         el("button", { type: "button", class: "btn primary", text: "Remplacer", onclick: apply }),
         el("button", { type: "button", class: "btn", text: "Annuler", onclick: function () { box.hidden = true; } })));
     box.hidden = false;
   };
-  rd.onerror = function () { flash("Lecture du fichier impossible.", "err"); };
+  rd.onerror = function () { flash("Lecture du fichier JSON impossible.", "err"); };
   rd.readAsText(file, "utf-8");
 });
 
