@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; form-action 'none'">
+<title>Démarche de rapprochement — Playback Solutions</title>
+<script>
+  try { var t = localStorage.getItem("mps-theme"); if (t === "dark" || t === "light") document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap bar">
+    <a class="brand" href="#demarche" aria-label="La démarche">
+      <img src="assets/logo-noir.png" alt="Playback Solutions" class="logo logo-light" width="235" height="36">
+      <img src="assets/logo-blanc.png" alt="" class="logo logo-dark" width="235" height="36" aria-hidden="true">
+    </a>
+    <nav class="tabs" aria-label="Sections">
+      <a href="#demarche" data-v="demarche">La démarche</a>
+      <a href="#reponses" data-v="reponses">Réponses <span class="count" id="progress-count">0/29</span></a>
+    </nav>
+    <button type="button" class="theme" id="theme-btn" aria-label="Changer de thème"></button>
+  </div>
+</header>
+
+<main>
+  <section class="wrap view" id="v-demarche">
+    <div class="hero">
+      <div class="eyebrow">Playback Solutions</div>
+      <h1>Démarche de rapprochement</h1>
+      <p class="lead">Un recueil d'informations et de réponses individuelles, sur une trame commune, pour examiner les possibilités de collaboration.</p>
+    </div>
+    <ol class="steps">
+      <li><b>Répondez</b> dans l'onglet « Réponses », à votre rythme. Cet outil fonctionne sans connexion Internet.</li>
+      <li><b>Sauvegardez</b> vos réponses dans un fichier JSON. Elles sont aussi enregistrées localement sur votre ordinateur, et ne sont pas transmises automatiquement.</li>
+      <li><b>Transmettez</b> à partir du <b>lundi 16 novembre 2026 à 11 h</b> : connectez-vous sur la plateforme de mise en commun et importez votre fichier JSON. Vous décidez de la transmission.</li>
+    </ol>
+    <div class="row"><a class="btn primary" href="#reponses">Accéder aux réponses</a></div>
+    <p class="muted small">Plateforme de mise en commun (à partir du 16 novembre, 11 h) : <span class="url">https://playbacktrice.github.io/matrice-playback-solutions/</span></p>
+  </section>
+
+  <section class="wrap view" id="v-reponses" hidden>
+    <div class="idbox">
+      <label><span class="lab">Nom</span><input id="p-name" type="text" maxlength="120" autocomplete="name" placeholder="Prénom Nom"></label>
+      <label><span class="lab">Structure</span><input id="p-structure" type="text" maxlength="120" autocomplete="organization" placeholder="Société"></label>
+    </div>
+
+    <div class="savepanel" aria-label="Sauvegarde">
+      <p class="st-line" id="st-local" role="status"></p>
+      <p class="st-line" id="st-file" role="status"></p>
+      <div class="row" id="st-actions"></div>
+      <input type="file" id="import-file" accept=".json,application/json" hidden>
+      <div id="import-confirm" class="confirm" hidden></div>
+      <p class="msg" id="save-msg" role="status" aria-live="polite"></p>
+    </div>
+
+    <div class="layout">
+      <nav class="toc" id="toc" aria-label="Sommaire"></nav>
+      <div class="cats-body" id="trame-body"></div>
+    </div>
+    <div class="row" id="clear-row"></div>
+  </section>
+</main>
+
+<footer class="wrap foot">Playback Solutions · outil de saisie hors ligne · aucune donnée n'est envoyée sur Internet depuis cet outil</footer>
+
+<script src="trame.js"></script>
+<script src="questionnaire.js"></script>
+</body>
+</html>

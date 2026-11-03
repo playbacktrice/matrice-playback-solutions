@@ -4,9 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>Matrice Playback Solutions</title>
+<title>Démarche de rapprochement — Playback Solutions</title>
 <script>
-  // Thème appliqué avant l'affichage pour éviter un flash
   try { var t = localStorage.getItem("mps-theme"); if (t === "dark" || t === "light") document.documentElement.dataset.theme = t; } catch (e) {}
 </script>
 <link rel="icon" type="image/png" href="assets/favicon.png">
@@ -17,14 +16,12 @@
 
 <header class="top">
   <div class="wrap bar">
-    <a class="brand" href="#accueil" aria-label="Accueil">
+    <a class="brand" href="#demarche" aria-label="La démarche">
       <img src="assets/logo-noir.png" alt="Playback Solutions" class="logo logo-light" width="235" height="36">
       <img src="assets/logo-blanc.png" alt="" class="logo logo-dark" width="235" height="36" aria-hidden="true">
     </a>
     <nav class="tabs" aria-label="Sections">
-      <a href="#accueil" data-v="accueil">La démarche</a>
-      <a href="#trame" data-v="trame">Réponses <span class="count" id="progress-count">0/29</span></a>
-      <a href="#fichier" data-v="fichier">Sauvegarder</a>
+      <a href="#demarche" data-v="demarche">La démarche</a>
       <a href="#commun" data-v="commun">Mise en commun</a>
     </nav>
     <button type="button" class="theme" id="theme-btn" aria-label="Changer de thème"></button>
@@ -32,91 +29,25 @@
 </header>
 
 <main>
-  <!-- ACCUEIL -->
-  <section class="wrap view" id="v-accueil">
+  <section class="wrap view" id="v-demarche">
     <div class="hero">
       <div class="eyebrow">Playback Solutions</div>
       <h1>Démarche de rapprochement</h1>
-      <p class="lead">Un cadre commun pour examiner les possibilités de collaboration. Chaque participant répond séparément, sur une trame identique.</p>
-      <div class="row">
-        <a class="btn primary" href="#trame">Accéder à la trame</a>
-        <span class="date">Mise en commun : <b>lundi 16 novembre 2026 à 11 h</b></span>
-      </div>
+      <p class="lead">Un recueil d'informations et de réponses individuelles, sur une trame commune, pour examiner les possibilités de collaboration.</p>
     </div>
-
-    <div class="grid3">
-      <div class="step"><span class="n">1</span><h3>Saisie des réponses</h3><p>Une réponse libre par sous-catégorie. La saisie peut se faire en plusieurs fois.</p></div>
-      <div class="step"><span class="n">2</span><h3>Conservation locale</h3><p>Les réponses sont enregistrées automatiquement dans ce navigateur, sur cet ordinateur. Elles ne sont visibles par aucun autre participant, ni par l'organisateur.</p></div>
-      <div class="step"><span class="n">3</span><h3>Transmission le 16 novembre</h3><p>À partir de l'heure d'ouverture, chaque participant transmet ses réponses depuis l'onglet « Mise en commun ». Les réponses deviennent alors consultables, nominativement, par les participants et l'administrateur.</p></div>
+    <ol class="steps">
+      <li><b>Téléchargez l'outil de saisie</b> et décompressez-le sur votre ordinateur. Il fonctionne sans connexion Internet.</li>
+      <li><b>Répondez et sauvegardez</b> vos réponses dans un fichier JSON. Elles sont enregistrées localement sur votre ordinateur et ne sont pas transmises automatiquement.</li>
+      <li><b>Transmettez</b> à partir du <b>lundi 16 novembre 2026 à 11 h</b>, dans l'espace « Mise en commun ». Vous décidez de la transmission ; elle est définitive.</li>
+    </ol>
+    <div class="dl-row">
+      <a class="btn primary" href="outil/Demarche-de-rapprochement-Playback-Solutions.zip" download>Télécharger l'outil de saisie (ZIP)</a>
+      <span class="muted small">Mode d'emploi inclus (fichier LISEZ-MOI).</span>
     </div>
-
-    <div class="prose">
-      <h2>Les 4 sujets</h2>
-      <ul class="cats" id="cat-list"></ul>
-    </div>
-
-    <div class="notes">
-      <div class="note">
-        <h3>Bon à savoir</h3>
-        <ul>
-          <li>Les réponses sont liées à <b>ce navigateur sur cet ordinateur</b>. En cas de changement d'ordinateur ou de navigateur, exporter le fichier puis le réimporter.</li>
-          <li>Une sauvegarde régulière du fichier est recommandée : l'effacement de l'historique ou des données du navigateur supprime les réponses.</li>
-          <li>Le nom saisi identifie le fichier. Il ne constitue pas une authentification.</li>
-        </ul>
-      </div>
-      <div class="note ai">
-        <h3><span class="ai-badge">IA</span> Utilisation de l'intelligence artificielle</h3>
-        <ul>
-          <li><b>Sur cette page, aucune fonctionnalité n'utilise l'IA.</b> Aucune réponse n'est envoyée avant sa transmission volontaire.</li>
-          <li>À partir du 16 novembre à 11 h, des <b>synthèses</b> des réponses (une par sous-catégorie et une synthèse générale) seront générées par une IA (Claude). Tout contenu produit par l'IA porte le badge <span class="ai-badge">IA</span> pour le distinguer des réponses écrites par les participants.</li>
-        </ul>
-      </div>
-    </div>
+    <div id="rescue"></div>
+    <p class="muted small">Les réponses transmises sont consultables, nominativement, par les participants et l'administrateur. Les synthèses sont générées par une IA (Claude) et signalées par le badge <span class="ai-badge">IA</span>.</p>
   </section>
 
-  <!-- TRAME -->
-  <section class="wrap view" id="v-trame" hidden>
-    <div class="namebox">
-      <label for="p-name">Nom et structure</label>
-      <input id="p-name" type="text" maxlength="120" autocomplete="name" placeholder="Ex. : Prénom Nom — Société">
-      <p class="muted small">Associé aux réponses et au fichier d'export.</p>
-    </div>
-    <div class="savebar"><span id="savebar" role="status" aria-live="polite"></span> <span id="backup-reminder" class="reminder"></span></div>
-    <div class="layout">
-      <nav class="toc" id="toc" aria-label="Sommaire"></nav>
-      <div class="cats-body" id="trame-body"></div>
-    </div>
-  </section>
-
-  <!-- FICHIER -->
-  <section class="wrap view" id="v-fichier" hidden>
-    <div class="prose">
-      <h2>Sauvegarder et transmettre</h2>
-      <p>Le fichier JSON contient votre nom et toutes vos réponses. Conservez-le pour sauvegarder votre travail.</p>
-    </div>
-    <div class="cards2">
-      <div class="card">
-        <h3>Exporter les réponses</h3>
-        <p class="muted" id="export-summary"></p>
-        <button type="button" class="btn primary" id="export-btn">Télécharger le fichier (.json)</button>
-        <p class="msg" id="export-msg" role="status"></p>
-      </div>
-      <div class="card">
-        <h3>Réimporter un fichier</h3>
-        <p class="muted">Pour reprendre les réponses sur un autre ordinateur ou navigateur, ou après un effacement des données.</p>
-        <input type="file" id="import-file" accept=".json,application/json" hidden>
-        <button type="button" class="btn" id="import-btn">Choisir un fichier…</button>
-        <div id="import-confirm" class="confirm" hidden></div>
-        <p class="msg" id="import-msg" role="status"></p>
-      </div>
-    </div>
-    <div class="card danger-zone">
-      <h3>Effacer les réponses de ce navigateur</h3>
-      <p class="muted">Exporter le fichier au préalable pour les conserver.</p>
-      <div class="row" id="clear-row"><button type="button" class="btn danger" id="clear-btn">Effacer</button></div>
-    </div>
-  </section>
-  <!-- MISE EN COMMUN (nécessite un compte) -->
   <section class="wrap view" id="v-commun" hidden>
     <div class="prose">
       <h2>Mise en commun</h2>
@@ -126,10 +57,10 @@
   </section>
 </main>
 
-<footer class="wrap foot">Matrice Playback Solutions · réponses enregistrées dans ce navigateur jusqu'à leur transmission · aucune fonctionnalité de ce site n'utilise l'IA ; une synthèse générée par IA est toujours signalée par le badge <span class="ai-badge">IA</span></footer>
+<footer class="wrap foot">Playback Solutions · Démarche de rapprochement</footer>
 
 <script src="trame.js"></script>
-<script src="app.js"></script>
+<script src="site.js"></script>
 <script src="vendor/supabase-2.45.4.js"></script>
 <script src="config.js"></script>
 <script src="collective.js"></script>

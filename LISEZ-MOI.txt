@@ -1,0 +1,28 @@
+DÉMARCHE DE RAPPROCHEMENT — PLAYBACK SOLUTIONS
+Outil de saisie hors ligne
+
+1. DÉCOMPRESSER
+   Mac : double-cliquer sur le fichier ZIP.
+   Windows : clic droit sur le fichier ZIP > « Extraire tout… » > « Extraire ».
+   (Ne pas ouvrir l'outil directement depuis le ZIP sans l'extraire.)
+
+2. OUVRIR
+   Double-cliquer sur « Ouvrir - Démarche de rapprochement.html ».
+   L'outil s'ouvre dans votre navigateur. Aucune connexion Internet n'est nécessaire.
+   Toujours rouvrir ce même fichier, depuis le même dossier et avec le même navigateur.
+
+3. RÉPONDRE ET SAUVEGARDER
+   Les réponses sont enregistrées localement sur votre ordinateur au fil de la saisie.
+   Elles ne sont pas transmises automatiquement.
+   - Chrome ou Edge : cliquer sur « Activer la sauvegarde automatique… » et choisir où
+     enregistrer le fichier JSON. Il est ensuite mis à jour toutes les 2 minutes en cas
+     de modification. À chaque réouverture de l'outil, cliquer sur « Réactiver la
+     sauvegarde automatique ».
+   - Safari, Firefox ou autre : cliquer régulièrement sur « Télécharger une sauvegarde ».
+     Chaque clic crée un nouveau fichier dans Téléchargements ; le plus récent fait foi.
+   Pour reprendre sur un autre ordinateur : « Importer un fichier… ».
+
+4. TRANSMETTRE — lundi 16 novembre 2026 à partir de 11 h
+   Se connecter sur https://playbacktrice.github.io/matrice-playback-solutions/
+   (onglet « Mise en commun ») avec ses identifiants personnels, importer le fichier
+   JSON, vérifier les réponses puis confirmer. La transmission est définitive.

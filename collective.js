@@ -7,6 +7,8 @@
 var root = document.getElementById("commun-root");
 var TRAME = window.TRAME;
 var ITEMS = [];
+function catLabel(c) { return (c.num ? c.num + ". " : "") + c.title; }
+function itemLabel(i) { return i.title + (i.optional && i.title !== "Commentaires généraux" ? " (facultatif)" : ""); }
 TRAME.forEach(function (c) { c.items.forEach(function (i) { ITEMS.push({ cat: c, item: i }); }); });
 
 function el(tag, attrs) {
@@ -201,7 +203,7 @@ function renderSubmit() {
   box.append(
     el("h3", { text: "1. Choisir les réponses à transmettre" }),
     el("div", { class: "row" },
-      el("button", { type: "button", class: "btn", text: "Importer un fichier JSON…", onclick: function () { fileInput.click(); } }),
+      el("button", { type: "button", class: "btn", text: "Importer le fichier JSON de réponses…", onclick: function () { fileInput.click(); } }),
       localCount ? el("button", { type: "button", class: "btn", text: "Utiliser les réponses de ce navigateur (" + localCount + ")",
         onclick: function () { setPreview(window.MPS_LOCAL.buildExport(), "ce navigateur"); } }) : null),
     fileInput,
@@ -213,7 +215,7 @@ function renderSubmit() {
 
 // Vérification locale (le serveur refait toutes les vérifications)
 function validateLocal(j) {
-  if (!j || j.format !== "matrice-playback-solutions") throw new Error("Ce fichier n'est pas un export de la Matrice Playback Solutions.");
+  if (!j || j.format !== "matrice-playback-solutions") throw new Error("Ce fichier n'est pas un fichier de réponses de la démarche.");
   if (j.formatVersion !== 1) throw new Error("Version de fichier non prise en charge.");
   var known = {}; ITEMS.forEach(function (x) { known[x.item.id] = true; });
   var answers = {}, seen = {};
@@ -225,9 +227,11 @@ function validateLocal(j) {
       seen[i.id] = true; answers[i.id] = i.answer;
     });
   });
-  var n = Object.keys(answers).filter(function (k) { return answers[k].trim(); }).length;
-  if (!n) throw new Error("Ce fichier ne contient aucune réponse.");
-  return { answers: answers, count: n, name: (j.participant && j.participant.name) || "" };
+  var filled = Object.keys(answers).filter(function (k) { return answers[k].trim(); });
+  if (!filled.length) throw new Error("Ce fichier ne contient aucune réponse.");
+  var optional = {}; ITEMS.forEach(function (x) { if (x.item.optional) optional[x.item.id] = true; });
+  var n = filled.filter(function (k) { return !optional[k]; }).length;
+  return { answers: answers, count: n, optionalCount: filled.length - n, name: (j.participant && j.participant.name) || "", structure: (j.participant && j.participant.structure) || "" };
 }
 
 function renderPreview() {
@@ -247,14 +251,16 @@ function renderPreview() {
   return el("div", { class: "stack" },
     el("h3", { text: "2. Vérifier avant de transmettre" }),
     el("p", {}, "Source : " + preview.source + " · Nom indiqué : ", el("b", { text: p.name || "(aucun)" }),
-      " · " + p.count + " sous-catégorie" + (p.count > 1 ? "s" : "") + " renseignée" + (p.count > 1 ? "s" : "") + " sur " + ITEMS.length + "."),
+      p.structure ? " (" + p.structure + ")" : "",
+      " · " + p.count + " rubrique" + (p.count > 1 ? "s" : "") + " renseignée" + (p.count > 1 ? "s" : "") + " sur " + ITEMS.filter(function (x) { return !x.item.optional; }).length +
+      (p.optionalCount ? " · " + p.optionalCount + " commentaire" + (p.optionalCount > 1 ? "s" : "") + " facultatif" + (p.optionalCount > 1 ? "s" : "") : "") + "."),
     nameWarn ? msg("Le nom indiqué dans le fichier diffère du nom du compte (" + status.display_name + "). Les réponses seront enregistrées au nom du compte.", "warn") : null,
     el("div", { class: "preview" }, TRAME.map(function (c) {
       return el("div", { class: "pv-cat", style: "--cc:var(--" + c.id + ")" },
-        el("h4", { text: c.num + ". " + c.title }),
+        el("h4", { text: catLabel(c) }),
         c.items.map(function (i) {
           var a = p.answers[i.id] || "";
-          return el("div", { class: "pv-item" }, el("b", { text: i.title }),
+          return el("div", { class: "pv-item" }, el("b", { text: itemLabel(i) }),
             a.trim() ? el("div", { class: "pre", text: a }) : el("div", { class: "muted small", text: "Pas de réponse" }));
         }));
     })),
@@ -292,14 +298,14 @@ function renderConsult() {
   var selected = people.filter(function (u) { return filters.people[u] !== false; });
 
   var chips = el("div", { class: "filters", role: "group", "aria-label": "Participants" },
-    submissions.map(function (s) {
+    submissions.slice().sort(function (x, y) { return nameOf(x.user_id).localeCompare(nameOf(y.user_id), "fr"); }).map(function (s) {
       var on = filters.people[s.user_id] !== false;
       return el("button", { type: "button", class: "chip", "aria-pressed": String(on), text: nameOf(s.user_id),
         onclick: function () { filters.people[s.user_id] = !on; render(); } });
     }));
   var catSel = el("select", { id: "f-cat", "aria-label": "Catégorie" },
     el("option", { value: "", text: "Toutes les catégories" }),
-    TRAME.map(function (c) { return el("option", { value: c.id, text: c.num + ". " + c.title, selected: filters.cat === c.id }); }));
+    TRAME.map(function (c) { return el("option", { value: c.id, text: catLabel(c), selected: filters.cat === c.id }); }));
   catSel.addEventListener("change", function () { filters.cat = catSel.value; filters.item = ""; render(); });
   var itemSel = el("select", { id: "f-item", "aria-label": "Sous-catégorie" },
     el("option", { value: "", text: "Toutes les sous-catégories" }),
@@ -309,24 +315,43 @@ function renderConsult() {
 
   var synItems = latestItems();
   var shown = ITEMS.filter(function (x) { return (!filters.cat || x.cat.id === filters.cat) && (!filters.item || x.item.id === filters.item); });
-  var subs = submissions.filter(function (s) { return selected.indexOf(s.user_id) >= 0; });
+  var subs = submissions.filter(function (s) { return selected.indexOf(s.user_id) >= 0; })
+    .sort(function (x, y) { return nameOf(x.user_id).localeCompare(nameOf(y.user_id), "fr"); });
+  // Champs facultatifs : affichés seulement si au moins un participant sélectionné les a renseignés (sauf sélection explicite)
+  shown = shown.filter(function (x) {
+    return !x.item.optional || filters.item === x.item.id || subs.some(function (s) { return s.answers && s.answers[x.item.id] && s.answers[x.item.id].trim(); });
+  });
+  var cols = "repeat(" + Math.max(subs.length, 1) + ", minmax(0, 1fr))";
+  var head = el("div", { class: "cmp-head", style: "grid-template-columns:" + cols },
+    subs.map(function (s) { return el("div", { class: "cmp-head-cell", text: nameOf(s.user_id) }); }));
   var groups = [], lastCat = null;
   shown.forEach(function (x) {
-    if (x.cat !== lastCat) { groups.push(el("h3", { class: "cmp-cat", style: "--cc:var(--" + x.cat.id + ")", text: x.cat.num + ". " + x.cat.title })); lastCat = x.cat; }
-    groups.push(el("section", { class: "cmp", style: "--cc:var(--" + x.cat.id + ")" },
-      el("header", {}, el("b", { text: x.item.title }), el("span", { class: "muted small", text: " — " + x.item.hint })),
-      el("div", { class: "cmp-grid" }, subs.map(function (s) {
+    if (x.cat !== lastCat) { groups.push(el("h3", { class: "cmp-cat", style: "--cc:var(--" + x.cat.id + ")", text: catLabel(x.cat) })); lastCat = x.cat; }
+    groups.push(el("section", { class: "cmp" + (x.item.optional ? " cmp-optional" : ""), style: "--cc:var(--" + x.cat.id + ")" },
+      el("header", {}, el("b", { text: itemLabel(x.item) }), el("span", { class: "muted small", text: " — " + x.item.hint })),
+      el("div", { class: "cmp-grid", style: "grid-template-columns:" + cols }, subs.map(function (s) {
         var a = (s.answers && s.answers[x.item.id]) || "";
         return el("div", { class: "cmp-cell" }, el("div", { class: "who", text: nameOf(s.user_id) }),
           a.trim() ? el("div", { class: "pre", text: a }) : el("div", { class: "muted small", text: "Pas de réponse" }));
       })),
       (synItems && synItems.items[x.item.id] && synItems.items[x.item.id].trim()) ? synBox(synItems, synItems.items[x.item.id]) : null));
   });
+  // Navigation rubrique par rubrique quand une sous-catégorie est sélectionnée
+  var nav = null;
+  if (filters.item) {
+    var all = ITEMS.filter(function (x) { return !filters.cat || x.cat.id === filters.cat; });
+    var idx = all.map(function (x) { return x.item.id; }).indexOf(filters.item);
+    nav = el("div", { class: "row between cmp-nav" },
+      el("button", { type: "button", class: "btn small", text: "← Rubrique précédente", disabled: idx <= 0,
+        onclick: function () { filters.item = all[idx - 1].item.id; render(); } }),
+      el("button", { type: "button", class: "btn small", text: "Rubrique suivante →", disabled: idx < 0 || idx >= all.length - 1,
+        onclick: function () { filters.item = all[idx + 1].item.id; render(); } }));
+  }
   return el("div", { class: "stack" }, statusList,
     el("div", { class: "card filters-card" },
       el("div", { class: "row" }, el("span", { class: "lab", text: "Participants" }), chips),
       el("div", { class: "row" }, catSel, itemSel)),
-    subs.length ? groups : el("p", { class: "banner", text: "Sélectionner au moins un participant." }),
+    subs.length ? [head, groups, nav] : el("p", { class: "banner", text: "Sélectionner au moins un participant." }),
     el("p", { class: "muted small", text: "Réponses originales, telles que transmises, sans modification ni traitement par IA." }));
 }
 
@@ -359,7 +384,7 @@ function renderSynVersion(s) {
     TRAME.forEach(function (c) {
       var its = c.items.filter(function (i) { return items[i.id] && items[i.id].trim(); });
       if (!its.length) return;
-      body.push(el("div", { class: "pv-cat", style: "--cc:var(--" + c.id + ")" }, el("h4", { text: c.num + ". " + c.title }),
+      body.push(el("div", { class: "pv-cat", style: "--cc:var(--" + c.id + ")" }, el("h4", { text: catLabel(c) }),
         its.map(function (i) { return el("div", { class: "pv-item" }, el("b", { text: i.title }), el("div", { class: "pre", text: items[i.id] })); })));
     });
   }
