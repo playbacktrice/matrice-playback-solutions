@@ -10,6 +10,14 @@
 </script>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="stylesheet" href="styles.css">
+<style>
+  .principes{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px 24px;display:flex;flex-direction:column;gap:14px;max-width:760px}
+  .principes h2{font-size:20px;line-height:1.3}
+  .principes ol{margin:0;padding-left:26px;display:flex;flex-direction:column;gap:8px;font-size:16px}
+  .principes li{padding-left:4px}
+  .principes li::marker{color:var(--accent);font-weight:600;font-variant-numeric:tabular-nums}
+  @media (max-width:600px){.principes{padding:16px 18px}.principes ol{padding-left:22px}}
+</style>
 </head>
 <body>
 
@@ -35,12 +43,28 @@
       <p class="lead">Un recueil d'informations et de réponses individuelles pour examiner les possibilités de collaboration.</p>
     </div>
     <ol class="steps">
-      <li><b>Répondez</b> dans l'onglet « Réponses », à votre rythme. Cet outil fonctionne sans connexion Internet.</li>
+      <li><b>Répondez</b> dans l'onglet « Réponses ». Cet outil fonctionne sans connexion Internet.</li>
       <li><b>Sauvegardez</b> vos réponses dans un fichier JSON. Elles sont aussi enregistrées en local sur votre ordinateur et ne sont pas transmises automatiquement.
         <div class="step-action"><a class="btn primary" href="#reponses">Accéder aux réponses</a></div></li>
       <li><b>Transmettez</b> à partir du <b>lundi 16 novembre 2026 à 11 h</b> : connectez-vous sur la plateforme de mise en commun et importez votre fichier JSON.
         <div class="step-action"><a class="btn primary" href="https://playbacktrice.github.io/matrice-playback-solutions/#commun" target="_blank" rel="noopener noreferrer">Accéder à la plateforme de mise en commun</a></div></li>
     </ol>
+    <section class="principes" aria-labelledby="principes-titre">
+      <h2 id="principes-titre">Principes de cette démarche de rapprochement</h2>
+      <ol>
+        <li>Cette démarche de rapprochement n'engage personne : chacun peut s'arrêter à tout moment.</li>
+        <li>Ce qui est partagé dans le cadre de cette démarche de rapprochement reste confidentiel.</li>
+        <li>Chacun garde ses clients et ses projets en cours.</li>
+        <li>Une communication claire, saine et régulière entre tous est indispensable.</li>
+        <li>Rien de personnel : les remarques portent sur le travail et les choix, jamais sur les personnes.</li>
+        <li>Pas de supposition : on vérifie avant de décider ou d'agir.</li>
+        <li>Toute idée ou action est d'abord proposée à tous, discutée si besoin, puis validée.</li>
+        <li>Toute décision est consignée par écrit : quoi, qui, quand.</li>
+        <li>Chaque tâche doit avoir un responsable nommé.</li>
+        <li>Chaque tâche doit avoir une échéance, même approximative. Sans échéance imaginable, la tâche n'est pas encore claire.</li>
+        <li>Un retard se signale dès qu'il est prévisible.</li>
+      </ol>
+    </section>
   </section>
 
   <section class="wrap view" id="v-reponses" hidden>
